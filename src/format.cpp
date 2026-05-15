@@ -13,7 +13,7 @@ std::format_context::iterator std::formatter<Network>::format(const Network& net
     }
 }
 
-std::format_context::iterator std::formatter<Network>::FormatDefault(const Network& network, std::format_context& ctx) const
+std::format_context::iterator std::formatter<Network>::FormatDefault(const Network& network, std::format_context& ctx)
 {
     auto out = ctx.out();
 
@@ -28,7 +28,7 @@ std::format_context::iterator std::formatter<Network>::FormatDefault(const Netwo
     return out;
 }
 
-std::format_context::iterator std::formatter<Network>::FormatLayers(const Network& network, std::format_context& ctx) const
+std::format_context::iterator std::formatter<Network>::FormatLayers(const Network& network, std::format_context& ctx)
 {
     auto out = ctx.out();
 
@@ -42,7 +42,7 @@ std::format_context::iterator std::formatter<Network>::FormatLayers(const Networ
     return out;
 }
 
-std::format_context::iterator std::formatter<Network>::FormatTikz(const Network& network, std::format_context& ctx) const
+std::format_context::iterator std::formatter<Network>::FormatTikz(const Network& network, std::format_context& ctx)
 {
     auto out = ctx.out();
 

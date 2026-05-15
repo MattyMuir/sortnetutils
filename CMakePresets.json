@@ -12,7 +12,7 @@
 				"CMAKE_CXX_COMPILER": "C:/Program Files/LLVM/bin/clang.exe",
 				"WARNINGS": "ON",
 				"SNU_MSVC_STATIC_RUNTIME": "ON",
-				"SNU_NO_ITERATOR_DEBUGGING": "ON"
+				"SNU_NO_ITERATOR_DEBUGGING": "OFF"
 			},
 			"condition": {
 				"type": "equals",

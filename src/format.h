@@ -38,7 +38,7 @@ public:
 protected:
 	FormatType type = FormatType::Default;
 
-	std::format_context::iterator FormatDefault(const Network& network, std::format_context& ctx) const;
-	std::format_context::iterator FormatLayers(const Network& network, std::format_context& ctx) const;
-	std::format_context::iterator FormatTikz(const Network& network, std::format_context& ctx) const;
+	static std::format_context::iterator FormatDefault(const Network& network, std::format_context& ctx);
+	static std::format_context::iterator FormatLayers(const Network& network, std::format_context& ctx);
+	static std::format_context::iterator FormatTikz(const Network& network, std::format_context& ctx);
 };
