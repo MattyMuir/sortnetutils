@@ -5,7 +5,7 @@ include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
 # === Create Library ===
-add_library(sortnetutils "square.cpp")
+add_library(sortnetutils "Network.h" "layers.cpp" "CE.h" "layers.h" "permute.h" "permute.cpp" "exec.h" "exec.cpp" "symmetry.h" "symmetry.cpp" "Network.cpp" "tikz.h" "tikz.cpp")
 
 # === Link Libraries ===
 

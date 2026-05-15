@@ -1,0 +1,10 @@
+#pragma once
+#include "Network.h"
+
+// All permutations use the 'gather' convention:
+// perm = [3, ...] means that position 0 gets its value from position 3 after the permutation is applied
+
+bool IsValidPerm(const std::vector<uint8_t>& perm);
+std::vector<uint8_t> InvertPerm(const std::vector<uint8_t>& perm);
+void Permute(Network& network, const std::vector<uint8_t>& perm);
+void Untangle(Network& network, uint8_t n);

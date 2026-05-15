@@ -1,3 +1,7 @@
 #pragma once
-
-int Square(int x);
+#include "../src/Network.h"
+#include "../src/exec.h"
+#include "../src/layers.h"
+#include "../src/permute.h"
+#include "../src/symmetry.h"
+#include "../src/tikz.h"
