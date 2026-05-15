@@ -3,4 +3,4 @@
 
 #include "Network.h"
 
-std::string GenerateTikz(uint8_t n, const Network& network);
+std::string GenerateTikz(const Network& network, uint8_t n);

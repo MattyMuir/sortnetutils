@@ -47,7 +47,7 @@ static inline void DrawComparator(std::string& latex, float x0, float y0, float 
 	latex += std::format("\\fill[{}] ({:.2f},{:.2f}) circle ({:.2f});\n", color, x1, y1, radius);
 }
 
-std::string GenerateTikz(uint8_t n, const Network& network)
+std::string GenerateTikz(const Network& network, uint8_t n)
 {
 	// === Parameters ===
 	float sublayerSeparation = 0.4f;

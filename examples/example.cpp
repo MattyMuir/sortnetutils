@@ -4,7 +4,7 @@
 
 void PrintGeneralInfo(const Network& network, uint8_t n)
 {
-	std::println("{}", network);
+	std::println("{:t}", network);
 	std::println("Symmetric: {}", IsSymmetric(network, n));
 	std::println("Valid:     {}", IsValid(network, n));
 }

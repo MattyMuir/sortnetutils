@@ -5,3 +5,4 @@
 #include "../src/permute.h"
 #include "../src/symmetry.h"
 #include "../src/tikz.h"
+#include "../src/format.h"
