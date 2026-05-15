@@ -63,6 +63,13 @@ bool IsSorted(uint8_t n, uint64_t output)
 	return output == sorted;
 }
 
+bool HasSmallerMirror(uint8_t n, uint64_t input)
+{
+	uint64_t flipped = ~input;
+	uint64_t reversed = ReverseBits(flipped) >> (64 - n);
+	return input > reversed;
+}
+
 static inline uint64_t Transpose8x8(uint64_t m)
 {
 	uint64_t t;
@@ -108,13 +115,6 @@ static inline uint64_t ReverseBits(uint64_t x)
 	x = ((x >> 2) & 0x3333333333333333ULL) | ((x & 0x3333333333333333ULL) << 2);
 	x = ((x >> 4) & 0x0F0F0F0F0F0F0F0FULL) | ((x & 0x0F0F0F0F0F0F0F0FULL) << 4);
 	return x;
-}
-
-static inline bool HasSmallerMirror(uint8_t n, uint64_t input)
-{
-	uint64_t flipped = ~input;
-	uint64_t reversed = ReverseBits(flipped) >> (64 - n);
-	return input > reversed;
 }
 
 std::vector<uint64_t> GetOutputs(const Network& network, uint8_t n, bool onlyUnsorted, bool symmetric)
