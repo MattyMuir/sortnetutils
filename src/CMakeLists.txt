@@ -46,22 +46,9 @@ configure_package_config_file(
 
 # Install the export set and configuration files
 install(EXPORT ${PROJECT_NAME}Config
-    FILE      ${PROJECT_NAME}Targets-debug.cmake
+    FILE      ${PROJECT_NAME}Targets.cmake
     NAMESPACE ${PROJECT_NAME}::
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
-    CONFIGURATIONS Debug
-)
-install(EXPORT ${PROJECT_NAME}Config
-    FILE      ${PROJECT_NAME}Targets-relwithdebinfo.cmake
-    NAMESPACE ${PROJECT_NAME}::
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
-    CONFIGURATIONS RelWithDebInfo
-)
-install(EXPORT ${PROJECT_NAME}Config
-    FILE      ${PROJECT_NAME}Targets-release.cmake
-    NAMESPACE ${PROJECT_NAME}::
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
-    CONFIGURATIONS Release
 )
 
 install(

@@ -1,7 +1,5 @@
 @PACKAGE_INIT@
 
-include("${CMAKE_CURRENT_LIST_DIR}/sortnetutilsTargets-release.cmake"        OPTIONAL)
-include("${CMAKE_CURRENT_LIST_DIR}/sortnetutilsTargets-relwithdebinfo.cmake" OPTIONAL)
-include("${CMAKE_CURRENT_LIST_DIR}/sortnetutilsTargets-debug.cmake"          OPTIONAL)
+include("${CMAKE_CURRENT_LIST_DIR}/sortnetutilsTargets.cmake")
 
 # Add find_package for dependencies here

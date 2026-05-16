@@ -63,6 +63,15 @@ bool IsSorted(uint8_t n, uint64_t output)
 	return output == sorted;
 }
 
+static inline uint64_t ReverseBits(uint64_t x)
+{
+	x = __builtin_bswap64(x);
+	x = ((x >> 1) & 0x5555555555555555ULL) | ((x & 0x5555555555555555ULL) << 1);
+	x = ((x >> 2) & 0x3333333333333333ULL) | ((x & 0x3333333333333333ULL) << 2);
+	x = ((x >> 4) & 0x0F0F0F0F0F0F0F0FULL) | ((x & 0x0F0F0F0F0F0F0F0FULL) << 4);
+	return x;
+}
+
 bool HasSmallerMirror(uint8_t n, uint64_t input)
 {
 	uint64_t flipped = ~input;
@@ -106,15 +115,6 @@ static inline void Transpose(uint64_t* transposed, uint8_t n, const std::vector<
 				reinterpret_cast<uint8_t*>(&transposed[byteIdx * 8 + p])[groupIdx] = (uint8_t)(tp >> (p * 8));
 		}
 	}
-}
-
-static inline uint64_t ReverseBits(uint64_t x)
-{
-	x = __builtin_bswap64(x);
-	x = ((x >> 1) & 0x5555555555555555ULL) | ((x & 0x5555555555555555ULL) << 1);
-	x = ((x >> 2) & 0x3333333333333333ULL) | ((x & 0x3333333333333333ULL) << 2);
-	x = ((x >> 4) & 0x0F0F0F0F0F0F0F0FULL) | ((x & 0x0F0F0F0F0F0F0F0FULL) << 4);
-	return x;
 }
 
 std::vector<uint64_t> GetOutputs(const Network& network, uint8_t n, bool onlyUnsorted, bool symmetric)
