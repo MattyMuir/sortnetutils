@@ -6,3 +6,4 @@
 #include "../src/symmetry.h"
 #include "../src/tikz.h"
 #include "../src/format.h"
+#include "../src/parse.h"

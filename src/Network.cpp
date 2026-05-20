@@ -3,8 +3,13 @@
 Network Concatenate(const Network& a, const Network& b)
 {
 	Network ret{ a };
-	ret.insert(ret.end(), b.begin(), b.end());
+	Append(ret, b);
 	return ret;
+}
+
+void Append(Network& a, const Network& b)
+{
+	a.insert(a.begin(), b.begin(), b.end());
 }
 
 uint8_t InferN(const Network& network)
