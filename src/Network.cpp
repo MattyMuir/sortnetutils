@@ -9,7 +9,7 @@ Network Concatenate(const Network& a, const Network& b)
 
 void Append(Network& a, const Network& b)
 {
-	a.insert(a.begin(), b.begin(), b.end());
+	a.insert(a.end(), b.begin(), b.end());
 }
 
 uint8_t InferN(const Network& network)
