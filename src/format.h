@@ -17,10 +17,14 @@ public:
     {
         auto it = ctx.begin();
         auto end = ctx.end();
-        size_t size = std::distance(it, end);
 
-        if (size == 1) return it;
-        if (size > 2)  throw std::format_error{ "Invalid format specifier" };
+        // Determine format string size
+        size_t size = 0;
+        for (auto it2 = it; it2 != end && *it2 != '}'; it2++)
+            size++;
+
+        if (size == 0) return it;
+        if (size > 1)  throw std::format_error{ "Invalid format specifier" };
 
         switch (*it)
         {
