@@ -19,3 +19,12 @@ uint8_t InferN(const Network& network)
 		maxHi = std::max(maxHi, hi);
 	return maxHi + 1;
 }
+
+uint8_t InferN(const std::vector<Network>& layers)
+{
+	uint8_t maxHi = 0;
+	for (const Network& layer : layers)
+		for (auto [_, hi] : layer)
+			maxHi = std::max(maxHi, hi);
+	return maxHi + 1;
+}
