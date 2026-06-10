@@ -1,10 +1,9 @@
-#include "NetworkVerifier.h"
+#include "NetworkVerifierV2.h"
 
 #include <numeric>
-#include <algorithm>
 
-NetworkVerifier::NetworkVerifier(const Network& network, uint8_t n_)
-	: worklist(network), n(n_), clusters(n), wireToCluster(n)
+NetworkVerifierV2::NetworkVerifierV2(const Network& network, uint8_t n_)
+	: worklist(network), n(n_), clusters(n), wireToCluster(n), hasPattern(1ULL << n, false)
 {
 	// Initialize clusters
 	for (uint8_t k = 0; k < n; k++)
@@ -14,7 +13,7 @@ NetworkVerifier::NetworkVerifier(const Network& network, uint8_t n_)
 	std::iota(wireToCluster.begin(), wireToCluster.end(), 0);
 }
 
-bool NetworkVerifier::IsValid()
+bool NetworkVerifierV2::IsValid()
 {
 	while (!worklist.empty())
 	{
@@ -37,22 +36,20 @@ bool NetworkVerifier::IsValid()
 	return NumOutputs() == (n + 1);
 }
 
-void NetworkVerifier::CombineClusters(uint8_t clusterIdx1, uint8_t clusterIdx2)
+void NetworkVerifierV2::CombineClusters(uint8_t clusterIdx1, uint8_t clusterIdx2)
 {
 	std::vector<uint64_t>& cluster1 = clusters[clusterIdx1];
 	std::vector<uint64_t>& cluster2 = clusters[clusterIdx2];
 
 	// Create the new cluster as the cartesian product of the two source clusters
 	std::vector<uint64_t> newCluster;
+	newCluster.reserve(cluster1.size() * cluster2.size());
 	for (uint64_t pattern1 : cluster1)
 		for (uint64_t pattern2 : cluster2)
 			newCluster.push_back(pattern1 | pattern2);
 
-	// Sort the patterns in the cluster
-	std::sort(newCluster.begin(), newCluster.end());
-
 	// Store the new cluster into the main clusters vector
-	cluster1 = newCluster;
+	std::swap(cluster1, newCluster);
 	cluster2.clear();
 
 	// Replace all occurences of wireToCluster[j] with the new combined cluster
@@ -61,68 +58,34 @@ void NetworkVerifier::CombineClusters(uint8_t clusterIdx1, uint8_t clusterIdx2)
 			clusterIdx = clusterIdx1;
 }
 
-void NetworkVerifier::ApplyCE(uint8_t i, uint8_t j)
+void NetworkVerifierV2::ApplyCE(uint8_t i, uint8_t j)
 {
 	uint64_t ceMask = 1ULL << i | 1ULL << j;
 	uint64_t flipMask = 1ULL << i;
 	std::vector<uint64_t>& cluster = clusters[wireToCluster[i]];
 
-	// Scan idxp and idxnp forward to the indices of
-	// the first patterns that need flipping and don't need flipping respectively
-	size_t idxp = 0, idxnp = 0;
-	while (idxp < cluster.size() && (cluster[idxp] & ceMask) != flipMask)
-		idxp += 1;
-	while (idxnp < cluster.size() && (cluster[idxnp] & ceMask) == flipMask)
-		idxnp += 1;
-
-	uint64_t last = UINT64_MAX;
 	std::vector<uint64_t> newCluster;
-	while (idxnp < cluster.size() && idxp < cluster.size())
+	newCluster.reserve(cluster.size());
+	for (uint64_t pattern : cluster)
 	{
-		uint64_t a = cluster[idxp] ^ ceMask;
-		uint64_t b = cluster[idxnp];
+		if ((pattern & ceMask) == flipMask)
+			pattern ^= ceMask;
 
-		if (a < b)
-		{
-			if (a != last)
-			{
-				newCluster.push_back(a);
-				last = a;
-			}
-			idxp++;
-			while (idxp < cluster.size() && (cluster[idxp] & ceMask) != flipMask)
-				idxp += 1;
-		}
-		else
-		{
-			if (b != last)
-			{
-				newCluster.push_back(b);
-				last = b;
-			}
-			idxnp++;
-			while (idxnp < cluster.size() && (cluster[idxnp] & ceMask) == flipMask)
-				idxnp += 1;
-		}
+		if (!hasPattern[pattern])
+			newCluster.push_back(pattern);
+		hasPattern[pattern] = true;
 	}
 
-	while (idxnp < cluster.size())
-	{
-		newCluster.push_back(cluster[idxnp]);
-		idxnp++;
-	}
+	// Reset the elements of hasPattern which we modified
+	for (uint64_t pattern : newCluster)
+		hasPattern[pattern] = false;
 
-	while (idxp < cluster.size())
-	{
-		newCluster.push_back(cluster[idxp] ^ ceMask);
-		idxp++;
-	}
-
-	cluster = newCluster;
+	std::swap(cluster, newCluster);
 }
 
-size_t NetworkVerifier::NumOutputs() const
+size_t NetworkVerifierV2::NumOutputs() const
 {
+	// The number of outputs is the product of the sizes of all the clusters
 	size_t numOutputs = 1;
 	for (const auto& cluster : clusters)
 		if (!cluster.empty())
@@ -130,7 +93,7 @@ size_t NetworkVerifier::NumOutputs() const
 	return numOutputs;
 }
 
-void NetworkVerifier::ReorderWorklist()
+void NetworkVerifierV2::ReorderWorklist()
 {
 	// If a comparator can be applied now (is in the same layer) and acts within a cluser:
 	// Move it to the front of the worklist

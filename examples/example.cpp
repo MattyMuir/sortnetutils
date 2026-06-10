@@ -1,21 +1,30 @@
 #include <print>
+#include <chrono>
 
 #include <sortnetutils.h>
 
 int main()
 {
 	Network network = ParseNetwork(R"(
-		[(0,5),(1,4),(2,9),(3,10),(6,7),(8,11)]
-		[(0,11),(2,4),(3,5),(6,9),(7,12),(8,10)]
-		[(0,3),(1,2),(4,9),(5,8),(6,7),(10,11)]
-		[(1,12),(2,5),(3,6),(4,10),(7,8),(9,11)]
-		[(0,2),(1,3),(4,7),(5,6),(8,12),(9,10)]
-		[(0,11),(2,5),(3,4),(6,7),(8,9),(10,12)]
-		[(0,1),(2,3),(4,5),(6,8),(7,10),(9,11)]
-		[(1,2),(3,4),(5,6),(7,8),(9,10),(11,12)]
-		[(0,12),(1,11),(2,10),(3,9),(4,8),(5,7)]
+		[(0,6),(1,10),(2,15),(3,5),(4,9),(7,16),(8,13),(11,17),(12,14)]
+		[(0,12),(1,4),(3,11),(5,17),(6,14),(7,8),(9,10),(13,16)]
+		[(1,13),(2,7),(4,16),(6,9),(8,11),(10,15)]
 		)");
 
-	std::println("{}", network);
-	std::println("{:l}", GetLayers(network));
+	auto start = std::chrono::steady_clock::now();
+
+	for (size_t i = 0; i < 5000; i++)
+	{
+#if 1
+		NetworkVerifierV2 verifier{ network, 18 };
+		bool isValid = verifier.IsValid();
+#else
+		auto outputs = GetOutputs(network, 18);
+#endif
+	}
+
+	auto end = std::chrono::steady_clock::now();
+	auto duration = end - start;
+	uint64_t micros = std::chrono::duration_cast<std::chrono::microseconds>(duration).count();
+	std::println("Took: {}ms", micros * 1.0e-3);
 }

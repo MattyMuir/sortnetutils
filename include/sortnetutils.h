@@ -7,3 +7,5 @@
 #include "../src/tikz.h"
 #include "../src/format.h"
 #include "../src/parse.h"
+#include "../src/NetworkVerifier.h"
+#include "../src/NetworkVerifierV2.h"
