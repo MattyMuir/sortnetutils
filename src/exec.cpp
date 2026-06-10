@@ -2,6 +2,8 @@
 
 #include <bit>
 
+#include "FactoredOutputSet.h"
+
 uint64_t RunNetwork(const Network& network, uint64_t input)
 {
 	for (auto [lo, hi] : network)
@@ -27,33 +29,8 @@ void RunNetwork(const Network& network, std::vector<uint64_t>& inputs)
 
 bool IsValid(const Network& network, uint8_t n)
 {
-	std::vector<uint64_t> inputs{
-		0b1010101010101010101010101010101010101010101010101010101010101010,
-		0b1100110011001100110011001100110011001100110011001100110011001100,
-		0b1111000011110000111100001111000011110000111100001111000011110000,
-		0b1111111100000000111111110000000011111111000000001111111100000000,
-		0b1111111111111111000000000000000011111111111111110000000000000000,
-		0b1111111111111111111111111111111100000000000000000000000000000000
-	};
-	inputs.resize(n);
-	std::vector<uint64_t> outputs;
-
-	uint64_t numPacks = ((1ULL << n) + 63) / 64;
-	for (uint64_t packIdx = 0; packIdx < numPacks; packIdx++)
-	{
-		for (uint8_t i = 0; i < n - 6; i++)
-			inputs[i + 6] = (packIdx & (1ULL << i)) ? (uint64_t)-1 : 0;
-
-		outputs = inputs;
-		RunNetwork(network, outputs);
-
-		uint64_t accum = 0;
-		for (size_t inputIdx = 0; inputIdx + 1 < n; inputIdx++)
-			accum |= ~outputs[inputIdx + 1] & outputs[inputIdx];
-		if (accum) return false;
-	}
-
-	return true;
+	FactoredOutputSet outputs{ network, n };
+	return outputs.Size() == n + 1;
 }
 
 bool IsSorted(uint8_t n, uint64_t output)

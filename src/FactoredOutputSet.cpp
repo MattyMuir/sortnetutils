@@ -1,9 +1,10 @@
-#include "NetworkVerifierV2.h"
+#include "FactoredOutputSet.h"
 
 #include <numeric>
+#include <print>
 
-NetworkVerifierV2::NetworkVerifierV2(const Network& network, uint8_t n_)
-	: worklist(network), n(n_), clusters(n), wireToCluster(n), hasPattern(1ULL << n, false)
+FactoredOutputSet::FactoredOutputSet(const Network& network, uint8_t n)
+	: clusters(n), wireToCluster(n)
 {
 	// Initialize clusters
 	for (uint8_t k = 0; k < n; k++)
@@ -11,10 +12,9 @@ NetworkVerifierV2::NetworkVerifierV2(const Network& network, uint8_t n_)
 
 	// Initialize mapping from wire -> cluster
 	std::iota(wireToCluster.begin(), wireToCluster.end(), 0);
-}
 
-bool NetworkVerifierV2::IsValid()
-{
+	// Apply all comparators to the output set
+	std::vector<CE> worklist{ network };
 	while (!worklist.empty())
 	{
 		// Pop the first comparator from the worklist
@@ -26,17 +26,25 @@ bool NetworkVerifierV2::IsValid()
 		if (wireToCluster[i] != wireToCluster[j])
 		{
 			CombineClusters(wireToCluster[i], wireToCluster[j]);
-			ReorderWorklist();
+			ReorderWorklist(worklist);
 		}
 
 		// Apply the comparator
 		ApplyCE(i, j);
 	}
-
-	return NumOutputs() == (n + 1);
 }
 
-void NetworkVerifierV2::CombineClusters(uint8_t clusterIdx1, uint8_t clusterIdx2)
+size_t FactoredOutputSet::Size() const
+{
+	// The total set size is the product of the sizes of all the clusters
+	size_t numOutputs = 1;
+	for (const auto& cluster : clusters)
+		if (!cluster.empty())
+			numOutputs *= cluster.size();
+	return numOutputs;
+}
+
+void FactoredOutputSet::CombineClusters(uint8_t clusterIdx1, uint8_t clusterIdx2)
 {
 	std::vector<uint64_t>& cluster1 = clusters[clusterIdx1];
 	std::vector<uint64_t>& cluster2 = clusters[clusterIdx2];
@@ -58,14 +66,23 @@ void NetworkVerifierV2::CombineClusters(uint8_t clusterIdx1, uint8_t clusterIdx2
 			clusterIdx = clusterIdx1;
 }
 
-void NetworkVerifierV2::ApplyCE(uint8_t i, uint8_t j)
+void FactoredOutputSet::ApplyCE(uint8_t i, uint8_t j)
 {
-	uint64_t ceMask = 1ULL << i | 1ULL << j;
-	uint64_t flipMask = 1ULL << i;
 	std::vector<uint64_t>& cluster = clusters[wireToCluster[i]];
 
+	// Initialize storage for the new cluster
 	std::vector<uint64_t> newCluster;
 	newCluster.reserve(cluster.size());
+
+	// Initialize hasPattern vector
+	size_t patternSpaceSize = 1ULL << wireToCluster.size();
+	thread_local std::vector<bool> hasPattern(patternSpaceSize, false);
+	if (hasPattern.size() < patternSpaceSize)
+		hasPattern.resize(patternSpaceSize, false);
+
+	// Apply the comparator to every pattern in the cluster
+	uint64_t ceMask = 1ULL << i | 1ULL << j;
+	uint64_t flipMask = 1ULL << i;
 	for (uint64_t pattern : cluster)
 	{
 		if ((pattern & ceMask) == flipMask)
@@ -75,27 +92,16 @@ void NetworkVerifierV2::ApplyCE(uint8_t i, uint8_t j)
 			newCluster.push_back(pattern);
 		hasPattern[pattern] = true;
 	}
+	std::swap(cluster, newCluster);
 
-	// Reset the elements of hasPattern which we modified
+	// Reset the elements of hasPattern which were modified
 	for (uint64_t pattern : newCluster)
 		hasPattern[pattern] = false;
-
-	std::swap(cluster, newCluster);
 }
 
-size_t NetworkVerifierV2::NumOutputs() const
+void FactoredOutputSet::ReorderWorklist(std::vector<CE>& worklist)
 {
-	// The number of outputs is the product of the sizes of all the clusters
-	size_t numOutputs = 1;
-	for (const auto& cluster : clusters)
-		if (!cluster.empty())
-			numOutputs *= cluster.size();
-	return numOutputs;
-}
-
-void NetworkVerifierV2::ReorderWorklist()
-{
-	// If a comparator can be applied now (is in the same layer) and acts within a cluser:
+	// If a comparator can be applied now (no earlier comparators overlap it) and acts within a cluser,
 	// Move it to the front of the worklist
 	std::vector<CE> l1, l2;
 	uint64_t usedChannels = 0;

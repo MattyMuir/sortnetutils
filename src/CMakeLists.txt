@@ -5,7 +5,7 @@ include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
 # === Create Library ===
-add_library(sortnetutils "Network.h" "layers.cpp" "CE.h" "layers.h" "permute.h" "permute.cpp" "exec.h" "exec.cpp" "symmetry.h" "symmetry.cpp" "Network.cpp" "tikz.h" "tikz.cpp" "format.h"  "parse.h" "parse.cpp"  "NetworkVerifier.h" "NetworkVerifier.cpp" "format.cpp" "NetworkVerifierV2.h" "NetworkVerifierV2.cpp")
+add_library(sortnetutils "Network.h" "layers.cpp" "CE.h" "layers.h" "permute.h" "permute.cpp" "exec.h" "exec.cpp" "symmetry.h" "symmetry.cpp" "Network.cpp" "tikz.h" "tikz.cpp" "format.h"  "parse.h" "parse.cpp"    "format.cpp" "FactoredOutputSet.h" "FactoredOutputSet.cpp")
 
 # === Link Libraries ===
 
@@ -17,7 +17,7 @@ set_target_properties(sortnetutils PROPERTIES
 if (SNU_MSVC_STATIC_RUNTIME)
     set_property(TARGET sortnetutils PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 endif()
-set_property(TARGET sortnetutils PROPERTY CXX_STANDARD 20)
+set_property(TARGET sortnetutils PROPERTY CXX_STANDARD 23)
 enable_ipo(sortnetutils)
 set_arch(sortnetutils)
 
