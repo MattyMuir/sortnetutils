@@ -92,11 +92,12 @@ void FactoredOutputSet::ApplyCE(uint8_t i, uint8_t j)
 			newCluster.push_back(pattern);
 		hasPattern[pattern] = true;
 	}
-	std::swap(cluster, newCluster);
 
 	// Reset the elements of hasPattern which were modified
 	for (uint64_t pattern : newCluster)
 		hasPattern[pattern] = false;
+
+	std::swap(cluster, newCluster);
 }
 
 void FactoredOutputSet::ReorderWorklist(std::vector<CE>& worklist)
