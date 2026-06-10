@@ -4,7 +4,7 @@
 
 bool IsSymmetric(const Network& network, uint8_t n)
 {
-	std::vector<Network> layers = GetLayers(network);
+	LayeredNetwork layers = GetLayers(network);
 
 	for (const Network& layer : layers)
 	{

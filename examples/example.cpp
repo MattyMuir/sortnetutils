@@ -16,6 +16,6 @@ int main()
 		[(0,12),(1,11),(2,10),(3,9),(4,8),(5,7)]
 		)");
 
-	std::println("{:t}", network);
-	std::println("Valid: {}", IsValid(network, 13));
+	std::println("{}", network);
+	std::println("{:l}", GetLayers(network));
 }

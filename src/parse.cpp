@@ -34,7 +34,7 @@ static inline Network ParseExplicitLayers(const std::string& str)
 {
 	std::vector<uint32_t> idxs = ExtractInts(str);
 
-	std::vector<Network> layers;
+	LayeredNetwork layers;
 	for (size_t ceIdx = 0; ceIdx < idxs.size(); ceIdx += 3)
 	{
 		uint8_t k = idxs[ceIdx + 0];

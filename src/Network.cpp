@@ -7,7 +7,7 @@ Network Concatenate(const Network& a, const Network& b)
 	return ret;
 }
 
-Network Concatenate(const std::vector<Network>& layers)
+Network Concatenate(const LayeredNetwork& layers)
 {
 	if (layers.empty()) return {};
 
@@ -30,7 +30,7 @@ uint8_t InferN(const Network& network)
 	return maxHi + 1;
 }
 
-uint8_t InferN(const std::vector<Network>& layers)
+uint8_t InferN(const LayeredNetwork& layers)
 {
 	uint8_t maxHi = 0;
 	for (const Network& layer : layers)

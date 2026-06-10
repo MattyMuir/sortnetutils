@@ -47,7 +47,7 @@ static inline void DrawComparator(std::string& latex, float x0, float y0, float 
 	latex += std::format("\\fill[{}] ({:.2f},{:.2f}) circle ({:.2f});\n", color, x1, y1, radius);
 }
 
-std::string GenerateTikz(const Network& network, uint8_t n)
+std::string GenerateTikz(const LayeredNetwork& network, uint8_t n)
 {
 	// === Parameters ===
 	float sublayerSeparation = 0.4f;
@@ -56,11 +56,10 @@ std::string GenerateTikz(const Network& network, uint8_t n)
 	// ==================
 
 	// Split into sublayers
-	std::vector<Network> layers = GetLayers(network);
 	std::vector<std::vector<Network>> allSublayers;
 
-	float maxX = (layers.size() - 1) * layerSeparation;
-	for (const auto& layer : layers)
+	float maxX = (network.size() - 1) * layerSeparation;
+	for (const auto& layer : network)
 	{
 		std::vector<Network> sublayers = SplitIntoSublayers(layer);
 		allSublayers.push_back(sublayers);

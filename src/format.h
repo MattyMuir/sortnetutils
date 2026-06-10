@@ -1,8 +1,18 @@
 #pragma once
+#include <format>
+
 #include "Network.h"
 
-template<>
-struct std::formatter<Network>
+std::format_context::iterator FormatDefault(const Network& network, std::format_context& ctx);
+std::format_context::iterator FormatLayers(const LayeredNetwork& network, std::format_context& ctx);
+std::format_context::iterator FormatTikz(const LayeredNetwork& network, std::format_context& ctx);
+
+std::format_context::iterator FormatDefault(const LayeredNetwork& network, std::format_context& ctx);
+std::format_context::iterator FormatLayers(const Network& network, std::format_context& ctx);
+std::format_context::iterator FormatTikz(const Network& network, std::format_context& ctx);
+
+template <NetworkTy T>
+struct std::formatter<T>
 {
 protected:
     enum class FormatType
@@ -37,12 +47,16 @@ public:
         return it + 1;
     }
 
-    std::format_context::iterator format(const Network& network, std::format_context& ctx) const;
+    std::format_context::iterator format(const T& network, std::format_context& ctx) const
+    {
+        switch (type)
+        {
+        case FormatType::Default:   return FormatDefault(network, ctx);
+        case FormatType::Layers:    return FormatLayers(network, ctx);
+        case FormatType::Tikz:      return FormatTikz(network, ctx);
+        }
+    }
 
 protected:
-	FormatType type = FormatType::Default;
-
-	static std::format_context::iterator FormatDefault(const Network& network, std::format_context& ctx);
-	static std::format_context::iterator FormatLayers(const Network& network, std::format_context& ctx);
-	static std::format_context::iterator FormatTikz(const Network& network, std::format_context& ctx);
+    FormatType type = FormatType::Default;
 };

@@ -1,19 +1,9 @@
 #include "format.h"
 
-#include "layers.h"
 #include "tikz.h"
+#include "layers.h"
 
-std::format_context::iterator std::formatter<Network>::format(const Network& network, std::format_context& ctx) const
-{
-    switch (type)
-    {
-    case FormatType::Default:   return FormatDefault(network, ctx);
-    case FormatType::Layers:    return FormatLayers(network, ctx);
-    case FormatType::Tikz:      return FormatTikz(network, ctx);
-    }
-}
-
-std::format_context::iterator std::formatter<Network>::FormatDefault(const Network& network, std::format_context& ctx)
+std::format_context::iterator FormatDefault(const Network& network, std::format_context& ctx)
 {
     auto out = ctx.out();
 
@@ -28,21 +18,20 @@ std::format_context::iterator std::formatter<Network>::FormatDefault(const Netwo
     return out;
 }
 
-std::format_context::iterator std::formatter<Network>::FormatLayers(const Network& network, std::format_context& ctx)
+std::format_context::iterator FormatLayers(const LayeredNetwork& network, std::format_context& ctx)
 {
     auto out = ctx.out();
 
-    std::vector<Network> layers = GetLayers(network);
-    for (size_t i = 0; i < layers.size(); i++)
+    for (size_t i = 0; i < network.size(); i++)
     {
         if (i) *out++ = '\n';
-        out = std::format_to(out, "{}", layers[i]);
+        out = std::format_to(out, "{}", network[i]);
     }
 
     return out;
 }
 
-std::format_context::iterator std::formatter<Network>::FormatTikz(const Network& network, std::format_context& ctx)
+std::format_context::iterator FormatTikz(const LayeredNetwork& network, std::format_context& ctx)
 {
     auto out = ctx.out();
 
@@ -51,4 +40,20 @@ std::format_context::iterator std::formatter<Network>::FormatTikz(const Network&
     out = std::format_to(out, "{}", tikz);
 
     return out;
+}
+
+
+std::format_context::iterator FormatDefault(const LayeredNetwork& network, std::format_context& ctx)
+{
+    return FormatDefault(Concatenate(network), ctx);
+}
+
+std::format_context::iterator FormatLayers(const Network& network, std::format_context& ctx)
+{
+    return FormatLayers(GetLayers(network), ctx);
+}
+
+std::format_context::iterator FormatTikz(const Network& network, std::format_context& ctx)
+{
+    return FormatTikz(GetLayers(network), ctx);
 }

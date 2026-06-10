@@ -27,10 +27,10 @@ uint8_t ComputeDepth(const Network& network)
 	return usedChannels.size();
 }
 
-std::vector<Network> GetLayers(const Network& network)
+LayeredNetwork GetLayers(const Network& network)
 {
 	std::vector<uint64_t> usedChannels;
-	std::vector<Network> layers;
+	LayeredNetwork layers;
 
 	for (CE ce : network)
 	{
