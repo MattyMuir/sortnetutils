@@ -3,6 +3,38 @@
 #include <numeric>
 #include <print>
 
+FactoredOutputSet::BitVec::BitVec(size_t size)
+	: packs((size + 63) / 64, 0) {}
+
+size_t FactoredOutputSet::BitVec::Size() const
+{
+	return packs.size() * 64;
+}
+
+void FactoredOutputSet::BitVec::Resize(size_t size)
+{
+	packs.resize((size + 63) / 64, 0);
+}
+
+bool FactoredOutputSet::BitVec::operator[](size_t idx) const
+{
+	size_t packIdx = idx / 64;
+	size_t packOff = idx % 64;
+	return packs[packIdx] & (1ULL << packOff);
+}
+
+void FactoredOutputSet::BitVec::SetBit(size_t idx)
+{
+	size_t packIdx = idx / 64;
+	size_t packOff = idx % 64;
+	packs[packIdx] |= (1ULL << packOff);
+}
+
+void FactoredOutputSet::BitVec::ClearBitLazy(size_t idx)
+{
+	packs[idx / 64] = 0;
+}
+
 FactoredOutputSet::FactoredOutputSet(const Network& network, uint8_t n)
 	: clusters(n), wireToCluster(n)
 {
@@ -48,16 +80,15 @@ void FactoredOutputSet::CombineClusters(uint8_t clusterIdx1, uint8_t clusterIdx2
 {
 	std::vector<uint64_t>& cluster1 = clusters[clusterIdx1];
 	std::vector<uint64_t>& cluster2 = clusters[clusterIdx2];
+	size_t cluster1Size = cluster1.size();
+	size_t cluster2Size = cluster2.size();
 
-	// Create the new cluster as the cartesian product of the two source clusters
-	std::vector<uint64_t> newCluster;
-	newCluster.reserve(cluster1.size() * cluster2.size());
-	for (uint64_t pattern1 : cluster1)
-		for (uint64_t pattern2 : cluster2)
-			newCluster.push_back(pattern1 | pattern2);
+	cluster1.resize(cluster1.size() * cluster2.size());
+	size_t writeIdx = cluster1Size;
+	for (size_t p2i = 1; p2i < cluster2Size; p2i++)
+		for (size_t p1i = 0; p1i < cluster1Size; p1i++)
+			cluster1[writeIdx++] = cluster1[p1i] | cluster2[p2i];
 
-	// Store the new cluster into the main clusters vector
-	std::swap(cluster1, newCluster);
 	cluster2.clear();
 
 	// Replace all occurences of wireToCluster[j] with the new combined cluster
@@ -70,52 +101,57 @@ void FactoredOutputSet::ApplyCE(uint8_t i, uint8_t j)
 {
 	std::vector<uint64_t>& cluster = clusters[wireToCluster[i]];
 
-	// Initialize storage for the new cluster
-	std::vector<uint64_t> newCluster;
-	newCluster.reserve(cluster.size());
-
 	// Initialize hasPattern vector
 	size_t patternSpaceSize = 1ULL << wireToCluster.size();
-	thread_local std::vector<bool> hasPattern(patternSpaceSize, false);
-	if (hasPattern.size() < patternSpaceSize)
-		hasPattern.resize(patternSpaceSize, false);
+	thread_local BitVec hasPattern{ patternSpaceSize };
+	if (hasPattern.Size() < patternSpaceSize)
+		hasPattern.Resize(patternSpaceSize);
 
 	// Apply the comparator to every pattern in the cluster
-	uint64_t ceMask = 1ULL << i | 1ULL << j;
-	uint64_t flipMask = 1ULL << i;
-	for (uint64_t pattern : cluster)
+	uint64_t ceWidth = j - i;
+	uint64_t jMask = 1ULL << j;
+	size_t writeIdx = 0;
+	for (size_t patternIdx = 0; patternIdx < cluster.size(); patternIdx++)
 	{
-		if ((pattern & ceMask) == flipMask)
-			pattern ^= ceMask;
+		uint64_t pattern = cluster[patternIdx];
 
+		// Build a mask containing 1s at bits i and j if a swap should occur
+		uint64_t swapMask = (pattern << ceWidth) & ~pattern;
+		swapMask &= jMask;
+		swapMask |= swapMask >> ceWidth;
+
+		// Apply the swap mask and insert
+		pattern ^= swapMask;
 		if (!hasPattern[pattern])
-			newCluster.push_back(pattern);
-		hasPattern[pattern] = true;
+			cluster[writeIdx++] = pattern;
+		hasPattern.SetBit(pattern);
 	}
 
-	// Reset the elements of hasPattern which were modified
-	for (uint64_t pattern : newCluster)
-		hasPattern[pattern] = false;
+	cluster.resize(writeIdx);
 
-	std::swap(cluster, newCluster);
+	// Reset the elements of hasPattern which were modified
+	for (uint64_t pattern : cluster)
+		hasPattern.ClearBitLazy(pattern);
 }
 
 void FactoredOutputSet::ReorderWorklist(std::vector<CE>& worklist)
 {
-	// If a comparator can be applied now (no earlier comparators overlap it) and acts within a cluser,
-	// Move it to the front of the worklist
-	std::vector<CE> l1, l2;
 	uint64_t usedChannels = 0;
-	for (auto [i, j] : worklist)
+	size_t writeIdx = 0;
+	for (size_t ceIdx = 0; ceIdx < worklist.size(); ceIdx++)
 	{
-		uint64_t ceMask = 1ULL << i | 1ULL << j;
-		if (!(usedChannels & ceMask) && wireToCluster[i] == wireToCluster[j])
-			l1.push_back({ i, j });
-		else
-			l2.push_back({ i, j });
+		// If a comparator can be applied now (no earlier comparators overlap it) and acts within a cluser, it has priority
+		auto [lo, hi] = worklist[ceIdx];
+		uint64_t ceMask = 1ULL << lo | 1ULL << hi;
+		bool isPriority = !(usedChannels & ceMask) && wireToCluster[lo] == wireToCluster[hi];
 		usedChannels |= ceMask;
-	}
 
-	worklist = l1;
-	worklist.insert(worklist.end(), l2.begin(), l2.end());
+		if (!isPriority) continue;
+
+		// Move priority elements backward towards writeIdx
+		for (size_t i = ceIdx; i > writeIdx; i--)
+			std::swap(worklist[i - 1], worklist[i]);
+
+		writeIdx++;
+	}
 }
