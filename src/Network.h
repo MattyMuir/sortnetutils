@@ -15,3 +15,4 @@ Network Concatenate(const LayeredNetwork& layers);
 void Append(Network& a, const Network& b);
 uint8_t InferN(const Network& network);
 uint8_t InferN(const LayeredNetwork& layers);
+bool IsGeneralized(const Network& network);

@@ -2,6 +2,7 @@
 
 #include <numeric>
 #include <print>
+#include <cassert>
 
 FactoredOutputSet::BitVec::BitVec(size_t size)
 	: packs((size + 63) / 64, 0) {}
@@ -38,6 +39,8 @@ void FactoredOutputSet::BitVec::ClearBitLazy(size_t idx)
 FactoredOutputSet::FactoredOutputSet(const Network& network, uint8_t n)
 	: clusters(n), wireToCluster(n)
 {
+	assert(!IsGeneralized(network));
+
 	// Initialize clusters
 	for (uint8_t k = 0; k < n; k++)
 		clusters[k] = { 0, 1ULL << k };
@@ -78,6 +81,8 @@ size_t FactoredOutputSet::Size() const
 
 void FactoredOutputSet::CombineClusters(uint8_t clusterIdx1, uint8_t clusterIdx2)
 {
+	if (clusterIdx1 > clusterIdx2) std::swap(clusterIdx1, clusterIdx2);
+
 	std::vector<uint64_t>& cluster1 = clusters[clusterIdx1];
 	std::vector<uint64_t>& cluster2 = clusters[clusterIdx2];
 	size_t cluster1Size = cluster1.size();

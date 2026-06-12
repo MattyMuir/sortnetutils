@@ -8,3 +8,4 @@
 #include "../src/format.h"
 #include "../src/parse.h"
 #include "../src/FactoredOutputSet.h"
+#include "../src/OutputSet.h"

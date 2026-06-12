@@ -32,4 +32,6 @@ protected:
 	void CombineClusters(uint8_t clusterIdx1, uint8_t clusterIdx2);
 	void ApplyCE(uint8_t i, uint8_t j);
 	void ReorderWorklist(std::vector<CE>& worklist);
+
+	friend class OutputSet;
 };

@@ -21,17 +21,14 @@ Network RandomNetwork(uint8_t n, size_t size)
 	return network;
 }
 
-int main()
+void SpeedTest()
 {
 	uint8_t n = 18;
 	Network prefix = ParseNetwork(R"(
-		[(0,6),(1,10),(2,15),(3,5),(4,9),(7,16),(8,13),(11,17),(12,14)]
-		[(0,12),(1,4),(3,11),(5,17),(6,14),(7,8),(9,10),(13,16)]
-		[(1,13),(2,7),(4,16),(6,9),(8,11),(10,15)]
+		[(0,1),(2,3),(4,5),(6,7),(8,9),(10,11),(12,13),(14,15),(16,17)]
+		[(0,2),(1,3),(4,12),(5,13),(6,8),(9,11),(14,16),(15,17)]
+		[(0,14),(1,16),(2,15),(3,17)]
 		)");
-
-	std::println("Num outputs: {}", GetOutputs(prefix, n).size());
-	std::println("Num outputs: {}", FactoredOutputSet{ prefix, n }.Size());
 
 	auto start = std::chrono::steady_clock::now();
 
@@ -46,4 +43,24 @@ int main()
 	auto end = std::chrono::steady_clock::now();
 	auto duration = end - start;
 	std::println("Took: {:.3f}ms", std::chrono::duration_cast<std::chrono::microseconds>(duration).count() * 1.0e-3);
+}
+
+int main()
+{
+	uint8_t n = 18;
+	size_t size = 27;
+
+	for (;;)
+	{
+		Network network = RandomNetwork(n, size);
+
+		OutputSet outputs1 = GetOutputs(network, n);
+		OutputSet outputs2{ FactoredOutputSet{ network, n } };
+
+		if (outputs1 != outputs2)
+		{
+			std::println("{}", network);
+			break;
+		}
+	}
 }

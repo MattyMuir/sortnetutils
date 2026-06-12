@@ -38,3 +38,10 @@ uint8_t InferN(const LayeredNetwork& layers)
 			maxHi = std::max(maxHi, hi);
 	return maxHi + 1;
 }
+
+bool IsGeneralized(const Network& network)
+{
+	for (auto [i, j] : network)
+		if (i > j) return true;
+	return false;
+}
