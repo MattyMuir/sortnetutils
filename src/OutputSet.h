@@ -6,8 +6,8 @@
 class OutputSet
 {
 public:
-	OutputSet(const FactoredOutputSet& outputSet);
-	OutputSet(FactoredOutputSet&& outputSet);
+	explicit OutputSet(const FactoredOutputSet& outputSet);
+	explicit OutputSet(FactoredOutputSet&& outputSet);
 	OutputSet(uint8_t n, const std::vector<uint64_t>& outputs_);
 
 	bool operator==(const OutputSet& other) const;

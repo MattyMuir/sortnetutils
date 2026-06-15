@@ -24,13 +24,18 @@ public:
 
 	bool IsValid();
 	size_t Size() const;
+	std::vector<uint64_t> ToVector() const;
+	bool IsFactored() const;
+
+	void ApplyCE(uint8_t i, uint8_t j);
+	void SwapBits(uint8_t i, uint8_t j);
 
 protected:
 	std::vector<std::vector<uint64_t>> clusters;
 	std::vector<uint8_t> wireToCluster;
 
 	void CombineClusters(uint8_t clusterIdx1, uint8_t clusterIdx2);
-	void ApplyCE(uint8_t i, uint8_t j);
+	void DoApplyCE(uint8_t i, uint8_t j);
 	void ReorderWorklist(std::vector<CE>& worklist);
 
 	friend class OutputSet;

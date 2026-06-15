@@ -65,7 +65,7 @@ FactoredOutputSet::FactoredOutputSet(const Network& network, uint8_t n)
 		}
 
 		// Apply the comparator
-		ApplyCE(i, j);
+		DoApplyCE(i, j);
 	}
 }
 
@@ -77,6 +77,63 @@ size_t FactoredOutputSet::Size() const
 		if (!cluster.empty())
 			numOutputs *= cluster.size();
 	return numOutputs;
+}
+
+std::vector<uint64_t> FactoredOutputSet::ToVector() const
+{
+	size_t numOutputs = Size();
+
+	// The first cluster will always be non-empty, copy its elements
+	std::vector<uint64_t> outputs;
+	outputs.reserve(numOutputs);
+	outputs.insert(outputs.begin(), clusters[0].begin(), clusters[0].end());
+
+	for (size_t clusterIdx = 1; clusterIdx < clusters.size(); clusterIdx++)
+	{
+		const std::vector<uint64_t>& cluster = clusters[clusterIdx];
+
+		// Skip empty clusters
+		if (cluster.empty()) continue;
+
+		size_t clusterSize1 = outputs.size();
+		for (size_t pi2 = 1; pi2 < cluster.size(); pi2++)
+			for (size_t pi1 = 0; pi1 < clusterSize1; pi1++)
+				outputs.push_back(outputs[pi1] | cluster[pi2]);
+	}
+
+	return outputs;
+}
+
+bool FactoredOutputSet::IsFactored() const
+{
+	for (size_t i = 1; i < clusters.size(); i++)
+		if (!clusters[i].empty()) return true;
+	return false;
+}
+
+void FactoredOutputSet::ApplyCE(uint8_t i, uint8_t j)
+{
+	if (wireToCluster[i] != wireToCluster[j])
+		CombineClusters(wireToCluster[i], wireToCluster[j]);
+
+	DoApplyCE(i, j);
+}
+
+void FactoredOutputSet::SwapBits(uint8_t i, uint8_t j)
+{
+	if (wireToCluster[i] != wireToCluster[j])
+		CombineClusters(wireToCluster[i], wireToCluster[j]);
+
+	std::vector<uint64_t>& cluster = clusters[wireToCluster[i]];
+	uint64_t leftMask = 1ULL << i;
+	uint64_t rightMask = 1ULL << j;
+	uint64_t stationaryMask = ~(leftMask | rightMask);
+	uint64_t shift = j - i;
+
+	for (uint64_t& pattern : cluster)
+		pattern = (pattern & stationaryMask)
+			| (pattern & leftMask) << shift
+			| (pattern & rightMask) >> shift;
 }
 
 void FactoredOutputSet::CombineClusters(uint8_t clusterIdx1, uint8_t clusterIdx2)
@@ -102,7 +159,7 @@ void FactoredOutputSet::CombineClusters(uint8_t clusterIdx1, uint8_t clusterIdx2
 			clusterIdx = clusterIdx1;
 }
 
-void FactoredOutputSet::ApplyCE(uint8_t i, uint8_t j)
+void FactoredOutputSet::DoApplyCE(uint8_t i, uint8_t j)
 {
 	std::vector<uint64_t>& cluster = clusters[wireToCluster[i]];
 

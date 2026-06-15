@@ -47,20 +47,7 @@ void SpeedTest()
 
 int main()
 {
-	uint8_t n = 18;
-	size_t size = 27;
+	Network network = ParseNetwork("[(4,5),(0,5),(2,7),(2,5),(1,6),(1,5),(1,2),(0,7),(1,7),(1,7),(6,7),(0,5),(0,7),(2,3),(3,4),(6,7)]");
 
-	for (;;)
-	{
-		Network network = RandomNetwork(n, size);
-
-		OutputSet outputs1 = GetOutputs(network, n);
-		OutputSet outputs2{ FactoredOutputSet{ network, n } };
-
-		if (outputs1 != outputs2)
-		{
-			std::println("{}", network);
-			break;
-		}
-	}
+	std::println("{:t}", network);
 }
