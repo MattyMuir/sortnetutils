@@ -6,9 +6,10 @@
 class OutputSet
 {
 public:
+	OutputSet(uint8_t n);
+	OutputSet(uint8_t n, const std::vector<uint64_t>& outputs_);
 	explicit OutputSet(const FactoredOutputSet& outputSet);
 	explicit OutputSet(FactoredOutputSet&& outputSet);
-	OutputSet(uint8_t n, const std::vector<uint64_t>& outputs_);
 
 	bool operator==(const OutputSet& other) const;
 
@@ -18,6 +19,9 @@ public:
 	size_t Size() const;
 	bool IsEmpty() const;
 	bool Contains(uint64_t x) const;
+
+	void Reserve(uint64_t size);
+	void Insert(uint64_t x);
 
 	std::vector<uint64_t> outputs;
 	std::vector<bool> containsOutput;

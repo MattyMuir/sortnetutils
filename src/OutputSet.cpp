@@ -1,5 +1,15 @@
 #include "OutputSet.h"
 
+OutputSet::OutputSet(uint8_t n)
+	: containsOutput(1ULL << n) {}
+
+OutputSet::OutputSet(uint8_t n, const std::vector<uint64_t>& outputs_)
+	: outputs(outputs_), containsOutput(1ULL << n)
+{
+	for (uint64_t output : outputs)
+		containsOutput[output] = true;
+}
+
 OutputSet::OutputSet(const FactoredOutputSet& outputSet)
 	: outputs(outputSet.ToVector()), containsOutput(1ULL << outputSet.wireToCluster.size())
 {
@@ -9,13 +19,6 @@ OutputSet::OutputSet(const FactoredOutputSet& outputSet)
 
 OutputSet::OutputSet(FactoredOutputSet&& outputSet)
 	: outputs(std::move(outputSet).ToVector()), containsOutput(1ULL << outputSet.wireToCluster.size())
-{
-	for (uint64_t output : outputs)
-		containsOutput[output] = true;
-}
-
-OutputSet::OutputSet(uint8_t n, const std::vector<uint64_t>& outputs_)
-	: outputs(outputs_), containsOutput(1ULL << n)
 {
 	for (uint64_t output : outputs)
 		containsOutput[output] = true;
@@ -49,6 +52,17 @@ bool OutputSet::IsEmpty() const
 bool OutputSet::Contains(uint64_t x) const
 {
 	return containsOutput[x];
+}
+
+void OutputSet::Reserve(uint64_t size)
+{
+	outputs.reserve(size);
+}
+
+void OutputSet::Insert(uint64_t x)
+{
+	outputs.push_back(x);
+	containsOutput[x] = true;
 }
 
 // An associative hash combination function
