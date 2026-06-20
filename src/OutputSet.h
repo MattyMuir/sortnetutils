@@ -19,7 +19,11 @@ public:
 	bool IsEmpty() const;
 	bool Contains(uint64_t x) const;
 
-protected:
 	std::vector<uint64_t> outputs;
 	std::vector<bool> containsOutput;
+};
+
+struct OutputSetHasher
+{
+	size_t operator()(const OutputSet& set) const;
 };

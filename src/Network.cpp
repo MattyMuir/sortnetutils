@@ -1,5 +1,7 @@
 #include "Network.h"
 
+#include <algorithm>
+
 Network Concatenate(const Network& a, const Network& b)
 {
 	Network ret{ a };
@@ -41,7 +43,5 @@ uint8_t InferN(const LayeredNetwork& layers)
 
 bool IsGeneralized(const Network& network)
 {
-	for (auto [i, j] : network)
-		if (i > j) return true;
-	return false;
+	return std::ranges::any_of(network, [](CE ce) { return ce.lo > ce.hi; });
 }

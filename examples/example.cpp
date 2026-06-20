@@ -47,7 +47,19 @@ void SpeedTest()
 
 int main()
 {
-	Network network = ParseNetwork("[(4,5),(0,5),(2,7),(2,5),(1,6),(1,5),(1,2),(0,7),(1,7),(1,7),(6,7),(0,5),(0,7),(2,3),(3,4),(6,7)]");
+	Network network = ParseNetwork(R"(
+		[(0,6),(1,10),(2,15),(3,5),(4,9),(7,16),(8,13),(11,17),(12,14)]
+		[(0,12),(1,4),(3,11),(5,17),(6,14),(7,8),(9,10),(13,16)]
+		)");
 
-	std::println("{:t}", network);
+	OutputSet outputs1 = GetOutputs(network, 18);
+
+	OutputSet outputs2{ outputs1 };
+	static std::mt19937_64 gen{ std::random_device{}() };
+	std::shuffle(outputs2.outputs.begin(), outputs2.outputs.begin(), gen);
+
+	size_t hash1 = OutputSetHasher{}(outputs1);
+	size_t hash2 = OutputSetHasher{}(outputs2);
+	std::println("Hash1: {}", hash1);
+	std::println("Hash2: {}", hash2);
 }
