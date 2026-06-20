@@ -21,45 +21,7 @@ Network RandomNetwork(uint8_t n, size_t size)
 	return network;
 }
 
-void SpeedTest()
-{
-	uint8_t n = 18;
-	Network prefix = ParseNetwork(R"(
-		[(0,1),(2,3),(4,5),(6,7),(8,9),(10,11),(12,13),(14,15),(16,17)]
-		[(0,2),(1,3),(4,12),(5,13),(6,8),(9,11),(14,16),(15,17)]
-		[(0,14),(1,16),(2,15),(3,17)]
-		)");
-
-	auto start = std::chrono::steady_clock::now();
-
-#if 1
-	for (size_t i = 0; i < 200'000; i++)
-		FactoredOutputSet outputs{ prefix, n };
-#else
-	for (size_t i = 0; i < 20'000; i++)
-		auto outputs = GetOutputs(prefix, n);
-#endif
-
-	auto end = std::chrono::steady_clock::now();
-	auto duration = end - start;
-	std::println("Took: {:.3f}ms", std::chrono::duration_cast<std::chrono::microseconds>(duration).count() * 1.0e-3);
-}
-
 int main()
 {
-	Network network = ParseNetwork(R"(
-		[(0,6),(1,10),(2,15),(3,5),(4,9),(7,16),(8,13),(11,17),(12,14)]
-		[(0,12),(1,4),(3,11),(5,17),(6,14),(7,8),(9,10),(13,16)]
-		)");
 
-	OutputSet outputs1 = GetOutputs(network, 18);
-
-	OutputSet outputs2{ outputs1 };
-	static std::mt19937_64 gen{ std::random_device{}() };
-	std::shuffle(outputs2.outputs.begin(), outputs2.outputs.begin(), gen);
-
-	size_t hash1 = OutputSetHasher{}(outputs1);
-	size_t hash2 = OutputSetHasher{}(outputs2);
-	std::println("Hash1: {}", hash1);
-	std::println("Hash2: {}", hash2);
 }
