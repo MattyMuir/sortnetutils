@@ -87,6 +87,7 @@ OutputSet Permute(const OutputSet& outputs, const std::vector<uint8_t>& perm)
 	uint8_t n = perm.size();
 
 	OutputSet permuted{ n };
+	permuted.Reserve(outputs.Size());
 	for (uint64_t output : outputs)
 		permuted.Insert(PermuteOutput(output, perm));
 

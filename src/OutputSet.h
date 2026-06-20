@@ -23,6 +23,7 @@ public:
 	void Reserve(uint64_t size);
 	void Insert(uint64_t x);
 
+protected:
 	std::vector<uint64_t> outputs;
 	std::vector<bool> containsOutput;
 };
