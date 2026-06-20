@@ -24,7 +24,8 @@ public:
 
 	bool IsValid();
 	size_t Size() const;
-	std::vector<uint64_t> ToVector() const;
+	std::vector<uint64_t> ToVector() const&;
+	std::vector<uint64_t> ToVector() &&;
 	bool IsFactored() const;
 
 	void ApplyCE(uint8_t i, uint8_t j);

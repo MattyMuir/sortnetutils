@@ -79,7 +79,7 @@ size_t FactoredOutputSet::Size() const
 	return numOutputs;
 }
 
-std::vector<uint64_t> FactoredOutputSet::ToVector() const
+std::vector<uint64_t> FactoredOutputSet::ToVector() const&
 {
 	size_t numOutputs = Size();
 
@@ -102,6 +102,30 @@ std::vector<uint64_t> FactoredOutputSet::ToVector() const
 	}
 
 	return outputs;
+}
+
+std::vector<uint64_t> FactoredOutputSet::ToVector() &&
+{
+	size_t numOutputs = Size();
+
+	// The first cluster will always be non-empty, re-use it as the return value
+	std::vector<uint64_t>& outputs = clusters[0];
+	outputs.reserve(numOutputs);
+
+	for (size_t clusterIdx = 1; clusterIdx < clusters.size(); clusterIdx++)
+	{
+		const std::vector<uint64_t>& cluster = clusters[clusterIdx];
+
+		// Skip empty clusters
+		if (cluster.empty()) continue;
+
+		size_t clusterSize1 = outputs.size();
+		for (size_t pi2 = 1; pi2 < cluster.size(); pi2++)
+			for (size_t pi1 = 0; pi1 < clusterSize1; pi1++)
+				outputs.push_back(outputs[pi1] | cluster[pi2]);
+	}
+
+	return std::move(outputs);
 }
 
 bool FactoredOutputSet::IsFactored() const
