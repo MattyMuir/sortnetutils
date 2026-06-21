@@ -1,6 +1,7 @@
 #include "parse.h"
 
 #include <ranges>
+#include <charconv>
 
 enum ParseType
 {

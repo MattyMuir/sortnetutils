@@ -5,6 +5,7 @@
 #include <format>
 #include <numeric>
 #include <bit>
+#include <algorithm>
 
 #include <sortnetutils.h>
 
