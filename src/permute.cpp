@@ -67,7 +67,7 @@ void Untangle(Network& network, uint8_t n)
 	}
 }
 
-static inline uint64_t PermuteOutput(uint64_t x, const std::vector<uint8_t>& perm)
+uint64_t Permute(uint64_t x, const std::vector<uint8_t>& perm)
 {
 	size_t n = perm.size();
 
@@ -89,7 +89,7 @@ OutputSet Permute(const OutputSet& outputs, const std::vector<uint8_t>& perm)
 	OutputSet permuted{ n };
 	permuted.Reserve(outputs.Size());
 	for (uint64_t output : outputs)
-		permuted.Insert(PermuteOutput(output, perm));
+		permuted.Insert(Permute(output, perm));
 
 	return permuted;
 }

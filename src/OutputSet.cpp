@@ -39,6 +39,11 @@ const uint64_t* OutputSet::end() const
 	return outputs.data() + outputs.size();
 }
 
+uint64_t OutputSet::operator[](size_t idx) const
+{
+	return outputs[idx];
+}
+
 size_t OutputSet::Size() const
 {
 	return outputs.size();

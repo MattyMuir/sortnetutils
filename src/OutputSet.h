@@ -15,6 +15,7 @@ public:
 
 	const uint64_t* begin() const;
 	const uint64_t* end() const;
+	uint64_t operator[](size_t idx) const;
 
 	size_t Size() const;
 	bool IsEmpty() const;
