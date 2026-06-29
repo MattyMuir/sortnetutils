@@ -6,6 +6,7 @@
 #include <numeric>
 #include <bit>
 #include <algorithm>
+#include <set>
 
 #include <sortnetutils.h>
 

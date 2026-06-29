@@ -9,3 +9,4 @@
 #include "../src/parse.h"
 #include "../src/FactoredOutputSet.h"
 #include "../src/OutputSet.h"
+#include "../src/random.h"

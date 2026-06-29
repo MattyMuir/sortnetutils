@@ -4,6 +4,7 @@
 
 // All permutations use the 'gather' convention:
 // perm = [3, ...] means that position 0 gets its value from position 3 after the permutation is applied
+// i.e. src = 3, dst = 0
 
 bool IsValidPerm(const std::vector<uint8_t>& perm);
 std::vector<uint8_t> InvertPerm(const std::vector<uint8_t>& perm);
