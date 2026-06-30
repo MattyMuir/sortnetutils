@@ -50,7 +50,18 @@ void OutputsToCSV(const std::string& filepath, const OutputSet& outputs, uint8_t
 	}
 }
 
+
+
 int main()
 {
+	for (uint8_t n = 2; n <= 18; n += 2)
+	{
+		auto allLayers = GetAllLayers(n, true);
 
+		size_t numFull = 0;
+		for (const Network& layer : allLayers)
+			if (layer.size() == n / 2)
+				numFull++;
+		std::println("{}: {}/{} = {:.3f}", n, numFull, allLayers.size(), (double)numFull / allLayers.size());
+	}
 }

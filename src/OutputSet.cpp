@@ -44,6 +44,11 @@ uint64_t OutputSet::operator[](size_t idx) const
 	return outputs[idx];
 }
 
+const std::vector<uint64_t>& OutputSet::ToVector() const
+{
+	return outputs;
+}
+
 size_t OutputSet::Size() const
 {
 	return outputs.size();
