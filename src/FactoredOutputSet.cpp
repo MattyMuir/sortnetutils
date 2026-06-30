@@ -135,6 +135,11 @@ bool FactoredOutputSet::IsFactored() const
 	return false;
 }
 
+bool FactoredOutputSet::IsRedundant() const
+{
+	return isRedundant;
+}
+
 void FactoredOutputSet::ApplyCE(uint8_t i, uint8_t j)
 {
 	if (wireToCluster[i] != wireToCluster[j])
@@ -213,6 +218,8 @@ void FactoredOutputSet::DoApplyCE(uint8_t i, uint8_t j)
 		hasPattern.SetBit(pattern);
 	}
 
+	if (writeIdx == cluster.size())
+		isRedundant = true;
 	cluster.resize(writeIdx);
 
 	// Reset the elements of hasPattern which were modified

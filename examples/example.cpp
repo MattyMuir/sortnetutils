@@ -54,14 +54,7 @@ void OutputsToCSV(const std::string& filepath, const OutputSet& outputs, uint8_t
 
 int main()
 {
-	for (uint8_t n = 2; n <= 18; n += 2)
-	{
-		auto allLayers = GetAllLayers(n, true);
-
-		size_t numFull = 0;
-		for (const Network& layer : allLayers)
-			if (layer.size() == n / 2)
-				numFull++;
-		std::println("{}: {}/{} = {:.3f}", n, numFull, allLayers.size(), (double)numFull / allLayers.size());
-	}
+	Network network = ParseNetwork("(0,1),(0,2),(1,2),(0,1)");
+	FactoredOutputSet outputs{ network, 3 };
+	std::println("Redundant: {}", outputs.IsRedundant());
 }

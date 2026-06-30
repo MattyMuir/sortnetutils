@@ -27,6 +27,7 @@ public:
 	std::vector<uint64_t> ToVector() const&;
 	std::vector<uint64_t> ToVector() &&;
 	bool IsFactored() const;
+	bool IsRedundant() const;
 
 	void ApplyCE(uint8_t i, uint8_t j);
 	void SwapBits(uint8_t i, uint8_t j);
@@ -34,6 +35,7 @@ public:
 protected:
 	std::vector<std::vector<uint64_t>> clusters;
 	std::vector<uint8_t> wireToCluster;
+	bool isRedundant = false;
 
 	void CombineClusters(uint8_t clusterIdx1, uint8_t clusterIdx2);
 	void DoApplyCE(uint8_t i, uint8_t j);
