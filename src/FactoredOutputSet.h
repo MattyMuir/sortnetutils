@@ -30,6 +30,7 @@ public:
 	bool IsRedundant() const;
 
 	void ApplyCE(uint8_t i, uint8_t j);
+	void ApplyCEs(const Network& ces);
 	void SwapBits(uint8_t i, uint8_t j);
 
 protected:

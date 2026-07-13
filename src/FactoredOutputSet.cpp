@@ -49,24 +49,7 @@ FactoredOutputSet::FactoredOutputSet(const Network& network, uint8_t n)
 	std::iota(wireToCluster.begin(), wireToCluster.end(), 0);
 
 	// Apply all comparators to the output set
-	std::vector<CE> worklist{ network };
-	while (!worklist.empty())
-	{
-		// Pop the first comparator from the worklist
-		auto [i, j] = worklist[0];
-		worklist.erase(worklist.begin());
-
-		// Comparators can only be applied within a cluster
-		// If this comparator spans two clusters, combine them
-		if (wireToCluster[i] != wireToCluster[j])
-		{
-			CombineClusters(wireToCluster[i], wireToCluster[j]);
-			ReorderWorklist(worklist);
-		}
-
-		// Apply the comparator
-		DoApplyCE(i, j);
-	}
+	ApplyCEs(network);
 }
 
 size_t FactoredOutputSet::Size() const
@@ -146,6 +129,28 @@ void FactoredOutputSet::ApplyCE(uint8_t i, uint8_t j)
 		CombineClusters(wireToCluster[i], wireToCluster[j]);
 
 	DoApplyCE(i, j);
+}
+
+void FactoredOutputSet::ApplyCEs(const Network& ces)
+{
+	std::vector<CE> worklist{ ces };
+	while (!worklist.empty())
+	{
+		// Pop the first comparator from the worklist
+		auto [i, j] = worklist[0];
+		worklist.erase(worklist.begin());
+
+		// Comparators can only be applied within a cluster
+		// If this comparator spans two clusters, combine them
+		if (wireToCluster[i] != wireToCluster[j])
+		{
+			CombineClusters(wireToCluster[i], wireToCluster[j]);
+			ReorderWorklist(worklist);
+		}
+
+		// Apply the comparator
+		DoApplyCE(i, j);
+	}
 }
 
 void FactoredOutputSet::SwapBits(uint8_t i, uint8_t j)

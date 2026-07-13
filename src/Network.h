@@ -17,3 +17,4 @@ size_t GetNetworkSize(const LayeredNetwork& network);
 uint8_t InferN(const Network& network);
 uint8_t InferN(const LayeredNetwork& layers);
 bool IsGeneralized(const Network& network);
+bool AreIdentical(const Network& a, const Network& b);

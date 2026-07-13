@@ -2,6 +2,8 @@
 
 #include <algorithm>
 
+#include "layers.h"
+
 Network Concatenate(const Network& a, const Network& b)
 {
 	Network ret{ a };
@@ -52,4 +54,24 @@ uint8_t InferN(const LayeredNetwork& layers)
 bool IsGeneralized(const Network& network)
 {
 	return std::ranges::any_of(network, [](CE ce) { return ce.lo > ce.hi; });
+}
+
+bool AreIdentical(const Network& a, const Network& b)
+{
+	auto aLayers = GetLayers(a);
+	auto bLayers = GetLayers(b);
+	if (aLayers.size() != bLayers.size())
+		return false;
+
+	for (size_t layerIdx = 0; layerIdx < aLayers.size(); layerIdx++)
+	{
+		Network aLayer = aLayers[layerIdx];
+		Network bLayer = bLayers[layerIdx];
+
+		std::sort(aLayer.begin(), aLayer.end());
+		std::sort(bLayer.begin(), bLayer.end());
+		if (aLayer != bLayer) return false;
+	}
+
+	return true;
 }

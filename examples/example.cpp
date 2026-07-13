@@ -50,11 +50,28 @@ void OutputsToCSV(const std::string& filepath, const OutputSet& outputs, uint8_t
 	}
 }
 
+void AddCE(Network& network, uint8_t i, uint8_t j)
+{
+	network.push_back({ (uint8_t)(i - 1), (uint8_t)(j - 1) });
+}
 
+Network CanonicalFL(uint8_t n, uint8_t k)
+{
+	Network L;
+	for (uint8_t i = 1; i <= n / 2 - k * 2; i++)
+		AddCE(L, i, n + 1 - i);
+
+	for (uint8_t i = 1; i <= k * 2; i++)
+		AddCE(L, n / 2 - k * 2 + i, n / 2 + i);
+
+	return L;
+}
 
 int main()
 {
-	Network network = ParseNetwork("(0,1),(0,2),(1,2),(0,1)");
-	FactoredOutputSet outputs{ network, 3 };
-	std::println("Redundant: {}", outputs.IsRedundant());
+	Network a = ParseNetwork("(0,1),(1,2),(3,4)");
+	Network b = ParseNetwork("(3,4),(1,2),(0,1)");
+
+	bool areIdentical = AreIdentical(a, b);
+	std::println("Identical: {}", areIdentical);
 }
