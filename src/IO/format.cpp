@@ -42,7 +42,7 @@ std::format_context::iterator FormatTikz(const Network& network, std::format_con
     return out;
 }
 
-inline std::format_context::iterator std::formatter<Network>::format(const Network& network, std::format_context& ctx) const
+std::format_context::iterator std::formatter<Network>::format(const Network& network, std::format_context& ctx) const
 {
     switch (type)
     {
