@@ -99,13 +99,10 @@ bool Network::Identical(const Network& a, const Network& b)
 	return aIndexed == bIndexed;
 }
 
-void Network::Permute(const std::vector<uint8_t>& perm)
+void Network::Permute(const Permutation& perm)
 {
-	uint8_t n = (uint8_t)perm.size();
-
-	std::vector<uint8_t> mapsTo(n);
-	for (uint8_t dst = 0; dst < n; dst++)
-		mapsTo[perm[dst]] = dst;
+	Permutation mapsTo{ perm };
+	mapsTo.Invert();
 
 	for (CE& ce : *this)
 	{
@@ -117,7 +114,7 @@ void Network::Permute(const std::vector<uint8_t>& perm)
 
 void Network::Untangle()
 {
-	std::vector<uint8_t> mapsTo(InferN());
+	Permutation mapsTo(InferN());
 	std::iota(mapsTo.begin(), mapsTo.end(), 0);
 	for (CE& ce : *this)
 	{

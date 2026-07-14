@@ -29,6 +29,19 @@ LayeredNetwork::LayeredNetwork(const Network& network)
 	}
 }
 
+LayeredNetwork LayeredNetwork::operator+(const Network& layer) const
+{
+	LayeredNetwork ret{ *this };
+	ret.emplace_back(layer);
+	return ret;
+}
+
+LayeredNetwork& LayeredNetwork::operator+=(const Network& layer)
+{
+	emplace_back(layer);
+	return *this;
+}
+
 size_t LayeredNetwork::NetworkSize() const
 {
 	size_t size = 0;

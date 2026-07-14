@@ -2,6 +2,7 @@
 #include <vector>
 
 #include "FactoredOutputSet.h"
+#include "../Permute/Permutation.h"
 
 class OutputSet
 {
@@ -24,6 +25,8 @@ public:
 
 	void Reserve(uint64_t size);
 	void Insert(uint64_t x);
+
+	static OutputSet Permute(const OutputSet& set, const Permutation& perm);
 
 protected:
 	std::vector<uint64_t> outputs;

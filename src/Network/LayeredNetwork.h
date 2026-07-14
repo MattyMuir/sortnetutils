@@ -12,5 +12,8 @@ public:
 	LayeredNetwork() = default;
 	explicit LayeredNetwork(const Network& network);
 
+	LayeredNetwork operator+(const Network& layer) const;
+	LayeredNetwork& operator+=(const Network& layer);
+
 	size_t NetworkSize() const;
 };

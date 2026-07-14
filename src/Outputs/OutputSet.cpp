@@ -75,6 +75,18 @@ void OutputSet::Insert(uint64_t x)
 	containsOutput[x] = true;
 }
 
+OutputSet OutputSet::Permute(const OutputSet& set, const Permutation& perm)
+{
+	uint8_t n = perm.size();
+
+	OutputSet permuted{ n };
+	permuted.Reserve(set.Size());
+	for (uint64_t output : set)
+		permuted.Insert(perm(output));
+
+	return permuted;
+}
+
 // An associative hash combination function
 static inline size_t HashCombine(size_t a, size_t b)
 {

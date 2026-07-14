@@ -3,6 +3,7 @@
 #include <format>
 
 #include "CE.h"
+#include "../Permute/Permutation.h"
 
 class LayeredNetwork;
 
@@ -28,6 +29,6 @@ public:
 	/// perm = [3, ...] means that position 0 gets its value from position 3 after the permutation is applied
 	/// i.e. src = 3, dst = 0
 	/// i.e. perm[dst] = src
-	void Permute(const std::vector<uint8_t>& perm);
+	void Permute(const Permutation& perm);
 	void Untangle();
 };
