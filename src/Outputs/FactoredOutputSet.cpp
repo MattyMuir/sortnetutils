@@ -39,7 +39,7 @@ void FactoredOutputSet::BitVec::ClearBitLazy(size_t idx)
 FactoredOutputSet::FactoredOutputSet(const Network& network, uint8_t n)
 	: clusters(n), wireToCluster(n)
 {
-	assert(!IsGeneralized(network));
+	assert(!network.IsGeneralized());
 
 	// Initialize clusters
 	for (uint8_t k = 0; k < n; k++)

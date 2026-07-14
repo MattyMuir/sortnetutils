@@ -72,6 +72,10 @@ int main()
 	Network a = ParseNetwork("(0,1),(1,2),(3,4)");
 	Network b = ParseNetwork("(3,4),(1,2),(0,1)");
 
-	bool areIdentical = AreIdentical(a, b);
+	bool areIdentical = Network::Identical(a, b);
 	std::println("Identical: {}", areIdentical);
+
+	std::println("{}\n", a);
+	std::println("{:l}\n", a);
+	std::println("{:t}\n", a);
 }

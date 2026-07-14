@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-#include "layers.h"
+#include "../Network/Network.h"
 
 static inline bool Overlaps(CE a, CE b)
 {

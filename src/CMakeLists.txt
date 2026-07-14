@@ -5,9 +5,7 @@ include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
 # === Create Library ===
-add_library(sortnetutils "Network.h" "layers.cpp" "CE.h" "layers.h" "permute.h" "permute.cpp" "exec.h" "exec.cpp" "symmetry.h" "symmetry.cpp" "Network.cpp" "tikz.h" "tikz.cpp" "format.h"  "parse.h" "parse.cpp"    "format.cpp" "FactoredOutputSet.h" "FactoredOutputSet.cpp" "OutputSet.h" "OutputSet.cpp" "random.h" "random.cpp")
-
-# === Link Libraries ===
+add_library(sortnetutils "Network/Network.h" "Network/layers.cpp" "Network/CE.h" "Network/layers.h" "Outputs/permute.h" "Outputs/permute.cpp"     "Network/Network.cpp" "IO/tikz.h" "IO/tikz.cpp" "IO/format.h"  "IO/parse.h" "IO/parse.cpp"    "IO/format.cpp" "Outputs/FactoredOutputSet.h" "Outputs/FactoredOutputSet.cpp" "Outputs/OutputSet.h" "Outputs/OutputSet.cpp" "Random/random.h" "Random/random.cpp" "Network/LayeredNetwork.h" "Network/LayeredNetwork.cpp" "Network/IndexedNetwork.h" "Network/IndexedNetwork.cpp" "Outputs/outpututil.h" "Outputs/outpututil.cpp")
 
 # === Feature Enables ===
 set_target_properties(sortnetutils PROPERTIES

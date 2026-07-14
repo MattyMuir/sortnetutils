@@ -1,5 +1,5 @@
 #pragma once
-#include "Network.h"
+#include "../Network/Network.h"
 
 class FactoredOutputSet
 {

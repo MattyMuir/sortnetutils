@@ -1,37 +1,4 @@
-#include "exec.h"
-
-#include <bit>
-
-#include "FactoredOutputSet.h"
-
-uint64_t RunNetwork(const Network& network, uint64_t input)
-{
-	for (auto [lo, hi] : network)
-	{
-		uint64_t loMask = 1ULL << lo;
-		uint64_t hiMask = 1ULL << hi;
-		if ((input & loMask) && (~input & hiMask))
-			input ^= loMask | hiMask;
-	}
-
-	return input;
-}
-
-void RunNetwork(const Network& network, std::vector<uint64_t>& inputs)
-{
-	for (auto [lo, hi] : network)
-	{
-		uint64_t newLo = inputs[lo] & inputs[hi];
-		inputs[hi] = inputs[lo] | inputs[hi];
-		inputs[lo] = newLo;
-	}
-}
-
-bool IsValid(const Network& network, uint8_t n)
-{
-	FactoredOutputSet outputs{ network, n };
-	return outputs.Size() == n + 1;
-}
+#include "outpututil.h"
 
 bool IsSorted(uint8_t n, uint64_t output)
 {

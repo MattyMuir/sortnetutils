@@ -3,6 +3,8 @@
 #include <ranges>
 #include <charconv>
 
+#include "../Network/LayeredNetwork.h"
+
 enum ParseType
 {
 	Default,
@@ -46,10 +48,7 @@ static inline Network ParseExplicitLayers(const std::string& str)
 		layers[k].push_back({ i, j });
 	}
 
-	Network network;
-	for (const Network& layer : layers) Append(network, layer);
-
-	return network;
+	return Network{ layers };
 }
 
 static inline Network ParseDefault(const std::string& str)
