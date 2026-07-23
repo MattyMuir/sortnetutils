@@ -1,5 +1,7 @@
 #include "outpututil.h"
 
+#include <bit>
+
 bool IsSorted(uint8_t n, uint64_t output)
 {
 	uint64_t numZeros = n - std::popcount(output);
