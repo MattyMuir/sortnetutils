@@ -5,7 +5,7 @@ include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 
 # === Create Library ===
-add_library(sortnetutils "Network/Network.h" "Network/layers.cpp" "Network/CE.h" "Network/layers.h"       "Network/Network.cpp" "IO/tikz.h" "IO/tikz.cpp" "IO/format.h"  "IO/parse.h" "IO/parse.cpp"    "IO/format.cpp" "Outputs/FactoredOutputSet.h" "Outputs/FactoredOutputSet.cpp" "Outputs/OutputSet.h" "Outputs/OutputSet.cpp" "Random/random.h" "Random/random.cpp" "Network/LayeredNetwork.h" "Network/LayeredNetwork.cpp" "Network/IndexedNetwork.h" "Network/IndexedNetwork.cpp" "Outputs/outpututil.h" "Outputs/outpututil.cpp" "Permute/Permutation.h" "Permute/Permutation.cpp")
+add_library(sortnetutils "Network/Network.h" "Network/layers.cpp" "Network/CE.h" "Network/layers.h"       "Network/Network.cpp" "IO/tikz.h" "IO/tikz.cpp" "IO/format.h"  "IO/parse.h" "IO/parse.cpp"    "IO/format.cpp" "Outputs/FactoredOutputSet.h" "Outputs/FactoredOutputSet.cpp" "Outputs/OutputSet.h" "Outputs/OutputSet.cpp" "Random/random.h" "Random/random.cpp" "Network/LayeredNetwork.h" "Network/LayeredNetwork.cpp" "Network/IndexedNetwork.h" "Network/IndexedNetwork.cpp" "Outputs/outpututil.h" "Outputs/outpututil.cpp" "Permute/Permutation.h" "Permute/Permutation.cpp" "Permute/FastPermutation.cpp" "Permute/FastPermutation.h")
 
 # === Feature Enables ===
 set_target_properties(sortnetutils PROPERTIES

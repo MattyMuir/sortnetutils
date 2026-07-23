@@ -69,13 +69,20 @@ Network CanonicalFL(uint8_t n, uint8_t k)
 
 int main()
 {
-	Network a = ParseNetwork("(0,1),(1,2),(3,4)");
-	Network b = ParseNetwork("(3,4),(1,2),(0,1)");
+	uint8_t n = 18;
 
-	bool areIdentical = Network::Identical(a, b);
-	std::println("Identical: {}", areIdentical);
+	static std::mt19937_64 gen{ std::random_device{}() };
+	std::uniform_int_distribution<uint64_t> xDist{ 0, (1ULL << n) - 1 };
 
-	std::println("{}\n", a);
-	std::println("{:l}\n", a);
-	std::println("{:t}\n", a);
+	for (;;)
+	{
+		Permutation perm(n);
+		std::iota(perm.begin(), perm.end(), 0);
+
+		FastPermutation fastperm{ perm };
+
+		uint64_t x = xDist(gen);
+		if (perm(x) != fastperm(x))
+			bool jfihhj = true;
+	}
 }

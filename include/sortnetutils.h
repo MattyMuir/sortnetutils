@@ -4,6 +4,7 @@
 #include "../src/Network/IndexedNetwork.h"
 #include "../src/Network/layers.h"
 #include "../src/Permute/Permutation.h"
+#include "../src/Permute/FastPermutation.h"
 #include "../src/IO/tikz.h"
 #include "../src/IO/format.h"
 #include "../src/IO/parse.h"
