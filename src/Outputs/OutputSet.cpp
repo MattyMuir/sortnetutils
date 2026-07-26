@@ -87,6 +87,16 @@ OutputSet OutputSet::Permute(const OutputSet& set, const Permutation& perm)
 	return permuted;
 }
 
+bool OutputSet::StrictSubset(const OutputSet& a, const OutputSet& b)
+{
+	if (a.Size() >= b.Size()) return false;
+
+	for (uint64_t x : a)
+		if (!b.Contains(x))
+			return false;
+	return true;
+}
+
 // An associative hash combination function
 static inline size_t HashCombine(size_t a, size_t b)
 {

@@ -27,6 +27,7 @@ public:
 	void Insert(uint64_t x);
 
 	static OutputSet Permute(const OutputSet& set, const Permutation& perm);
+	static bool StrictSubset(const OutputSet& a, const OutputSet& b);
 
 protected:
 	std::vector<uint64_t> outputs;
