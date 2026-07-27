@@ -78,8 +78,10 @@ int main()
 	{
 		Permutation perm(n);
 		std::iota(perm.begin(), perm.end(), 0);
+		std::shuffle(perm.begin(), perm.end(), gen);
 
-		FastPermutation fastperm{ perm };
+		FastPermutation fastperm{ (uint8_t)perm.size() };
+		fastperm.Assign(perm);
 
 		uint64_t x = xDist(gen);
 		if (perm(x) != fastperm(x))

@@ -4,7 +4,9 @@
 class FastPermutation
 {
 public:
-    FastPermutation(const Permutation& perm);
+    FastPermutation(uint8_t n);
+
+    void Assign(const Permutation& perm);
 
     uint64_t operator()(uint64_t x) const;
 
