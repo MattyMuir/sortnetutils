@@ -1,8 +1,10 @@
 #include "FactoredOutputSet.h"
 
 #include <numeric>
-#include <print>
 #include <cassert>
+#include <bit>
+#include <algorithm>
+#include <set>
 
 FactoredOutputSet::BitVec::BitVec(size_t size)
 	: packs((size + 63) / 64, 0) {}
@@ -50,6 +52,83 @@ FactoredOutputSet::FactoredOutputSet(const Network& network, uint8_t n)
 
 	// Apply all comparators to the output set
 	ApplyCEs(network);
+}
+
+static inline void Dfs(uint8_t u, const std::vector<std::vector<bool>>& dependent, std::vector<bool>& visited, std::vector<uint8_t>& component)
+{
+	visited[u] = true;
+	component.push_back(u);
+
+	for (uint8_t v = 0; v < (uint8_t)visited.size(); v++)
+		if (dependent[u][v] && !visited[v])
+			Dfs(v, dependent, visited, component);
+}
+
+static inline std::vector<std::vector<uint8_t>> GetComponents(const std::vector<std::vector<bool>>& dependent)
+{
+	uint8_t n = (uint8_t)dependent.size();
+	std::vector<bool> visited(n, false);
+	std::vector<std::vector<uint8_t>> components;
+
+	for (uint8_t i = 0; i < n; i++)
+	{
+		if (visited[i]) continue;
+		components.emplace_back();
+		Dfs(i, dependent, visited, components.back());
+	}
+
+	return components;
+}
+
+FactoredOutputSet::FactoredOutputSet(const std::vector<uint64_t>& outputs, uint8_t n)
+	: clusters(n), wireToCluster(n)
+{
+	// Build dependency graph
+	std::vector<std::vector<bool>> dependent(n, std::vector<bool>(n, false));
+	for (uint8_t i = 0; i < n; i++)
+	{
+		for (uint8_t j = i + 1; j < n; j++)
+		{
+			// For all outputs, extract bits i and j and track observed patterns
+			uint64_t ijMask = (1ULL << i) | (1ULL << j);
+			uint64_t ijSeen = 0;
+			for (uint64_t x : outputs)
+				ijSeen |= (1ULL << _pext_u64(x, ijMask));
+
+			// Packed LUT of independent masks
+			static constexpr uint16_t IndependentMasks =
+				(1 << 0b0001) | (1 << 0b0010) | (1 << 0b0100) | (1 << 0b1000) | // 1x1
+				(1 << 0b0101) | (1 << 0b1010) |                                 // 1x2
+				(1 << 0b0011) | (1 << 0b1100) |                                 // 2x1
+				(1 << 0b1111);                                                  // 2x2
+
+			// Add a dependency edge if the bits are not independent
+			if ((IndependentMasks & (1 << ijSeen)) == 0)
+			{
+				dependent[i][j] = true;
+				dependent[j][i] = true;
+			}
+		}
+	}
+	
+	// Get dependent components (partitions)
+	auto partitions = GetComponents(dependent);
+
+	for (size_t partitionIdx = 0; partitionIdx < partitions.size(); partitionIdx++)
+	{
+		// Compute the partition mask
+		const auto& partition = partitions[partitionIdx];
+		uint64_t partitionMask = 0;
+		for (uint8_t i : partition) partitionMask |= (1ULL << i);
+
+		// Track which patterns occur over this partition
+		std::set<uint64_t> cluster;
+		for (uint64_t x : outputs) cluster.insert(x & partitionMask);
+		clusters[partitionIdx].assign_range(cluster);
+
+		// Update wireToCluster
+		for (uint8_t i : partition) wireToCluster[i] = partitionIdx;
+	}
 }
 
 size_t FactoredOutputSet::Size() const

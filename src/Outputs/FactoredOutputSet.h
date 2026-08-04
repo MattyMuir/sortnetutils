@@ -21,6 +21,7 @@ protected:
 
 public:
 	FactoredOutputSet(const Network& network, uint8_t n);
+	FactoredOutputSet(const std::vector<uint64_t>& outputs, uint8_t n);
 
 	bool IsValid();
 	size_t Size() const;
@@ -33,9 +34,10 @@ public:
 	void ApplyCEs(const Network& ces);
 	void SwapBits(uint8_t i, uint8_t j);
 
-protected:
 	std::vector<std::vector<uint64_t>> clusters;
 	std::vector<uint8_t> wireToCluster;
+
+protected:
 	bool isRedundant = false;
 
 	void CombineClusters(uint8_t clusterIdx1, uint8_t clusterIdx2);

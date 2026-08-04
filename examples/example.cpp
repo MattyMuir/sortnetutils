@@ -67,24 +67,35 @@ Network CanonicalFL(uint8_t n, uint8_t k)
 	return L;
 }
 
+void SortFactored(FactoredOutputSet& outputs)
+{
+	for (auto& cluster : outputs.clusters)
+		std::sort(cluster.begin(), cluster.end());
+	std::sort(outputs.clusters.begin(), outputs.clusters.end());
+}
+
 int main()
 {
-	uint8_t n = 18;
-
-	static std::mt19937_64 gen{ std::random_device{}() };
-	std::uniform_int_distribution<uint64_t> xDist{ 0, (1ULL << n) - 1 };
+	uint8_t n = 12;
+	size_t depth = 3;
+	bool symmetric = false;
 
 	for (;;)
 	{
-		Permutation perm(n);
-		std::iota(perm.begin(), perm.end(), 0);
-		std::shuffle(perm.begin(), perm.end(), gen);
+		Network network = RandomNetworkLayered(n, depth, symmetric);
 
-		FastPermutation fastperm{ (uint8_t)perm.size() };
-		fastperm.Assign(perm);
+		FactoredOutputSet factored{ network, n };
+		FactoredOutputSet refactored{ factored.ToVector(), n };
 
-		uint64_t x = xDist(gen);
-		if (perm(x) != fastperm(x))
-			bool jfihhj = true;
+		SortFactored(factored);
+		SortFactored(refactored);
+
+		bool equal = (factored.clusters == refactored.clusters);
+		std::println("{}", equal);
+		if (!equal)
+		{
+			std::println("{}", network);
+			return 1;
+		}
 	}
 }
