@@ -18,11 +18,14 @@ static inline uint64_t ReverseBits(uint64_t x)
 	return x;
 }
 
+uint64_t Mirror(uint8_t n, uint64_t x)
+{
+	return ReverseBits(~x) >> (64 - n);
+}
+
 bool HasSmallerMirror(uint8_t n, uint64_t input)
 {
-	uint64_t flipped = ~input;
-	uint64_t reversed = ReverseBits(flipped) >> (64 - n);
-	return input > reversed;
+	return input > Mirror(n, input);
 }
 
 OutputSet GetOutputs(const Network& network, uint8_t n, bool onlyUnsorted, bool symmetric)
