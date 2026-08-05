@@ -22,3 +22,12 @@ void Permutation::Invert()
 		inverted[(*this)[dst]] = dst;
 	std::swap(*this, inverted);
 }
+
+bool Permutation::IsSymmetric() const
+{
+	uint8_t n = size();
+	for (uint8_t i = 0; i < (n + 1) / 2; i++)
+		if ((*this)[i] + (*this)[n - 1 - i] != n - 1)
+			return false;
+	return true;
+}

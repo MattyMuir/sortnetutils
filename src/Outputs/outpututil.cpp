@@ -2,6 +2,8 @@
 
 #include <bit>
 
+#include "OutputSet.h"
+
 bool IsSorted(uint8_t n, uint64_t output)
 {
 	uint64_t numZeros = n - std::popcount(output);
@@ -38,4 +40,21 @@ OutputSet GetOutputs(const Network& network, uint8_t n, bool onlyUnsorted, bool 
 	if (symmetric)		std::erase_if(reducedOutputs, [n](uint64_t x) { return HasSmallerMirror(n, x); });
 
 	return OutputSet{ n, reducedOutputs };
+}
+
+static inline uint64_t SplitMix(uint64_t x)
+{
+	x ^= x >> 30;
+	x *= 0xbf58476d1ce4e5b9ULL;
+	x ^= x >> 27;
+	x *= 0x94d049bb133111ebULL;
+	x ^= x >> 31;
+	return x;
+}
+
+uint64_t HashOutputs(const std::vector<uint64_t>& outputs)
+{
+	size_t hash = 0;
+	for (uint64_t x : outputs) hash += SplitMix(x);
+	return hash;
 }

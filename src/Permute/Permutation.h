@@ -13,4 +13,5 @@ public:
 	uint64_t operator()(uint64_t x) const;
 
 	void Invert();
+	bool IsSymmetric() const;
 };

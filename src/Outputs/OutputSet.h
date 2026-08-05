@@ -3,6 +3,7 @@
 
 #include "FactoredOutputSet.h"
 #include "../Permute/Permutation.h"
+#include "outpututil.h"
 
 class OutputSet
 {
@@ -32,6 +33,8 @@ public:
 protected:
 	std::vector<uint64_t> outputs;
 	std::vector<bool> containsOutput;
+
+	friend struct OutputSetHasher;
 };
 
 struct OutputSetHasher

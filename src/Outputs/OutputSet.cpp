@@ -97,21 +97,7 @@ bool OutputSet::StrictSubset(const OutputSet& a, const OutputSet& b)
 	return true;
 }
 
-// An associative hash combination function
-static inline size_t HashCombine(size_t a, size_t b)
-{
-	b ^= b >> 30;
-	b *= 0xbf58476d1ce4e5b9ULL;
-	b ^= b >> 27;
-	b *= 0x94d049bb133111ebULL;
-	b ^= b >> 31;
-	return a + b;
-}
-
 size_t OutputSetHasher::operator()(const OutputSet& set) const
 {
-	size_t hash = 0;
-	for (uint64_t x : set)
-		hash = HashCombine(hash, x);
-	return hash;
+	return HashOutputs(set.outputs);
 }
