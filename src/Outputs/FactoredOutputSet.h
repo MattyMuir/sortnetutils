@@ -1,24 +1,9 @@
 #pragma once
 #include "../Network/Network.h"
+#include "BitVec.h"
 
 class FactoredOutputSet
 {
-protected:
-	class BitVec
-	{
-	public:
-		BitVec(size_t size);
-
-		size_t Size() const;
-		void Resize(size_t size);
-		bool operator[](size_t idx) const;
-		void SetBit(size_t idx);
-		void ClearBitLazy(size_t idx);
-
-	protected:
-		std::vector<uint64_t> packs;
-	};
-
 public:
 	FactoredOutputSet(const Network& network, uint8_t n);
 	FactoredOutputSet(const std::vector<uint64_t>& outputs, uint8_t n);
