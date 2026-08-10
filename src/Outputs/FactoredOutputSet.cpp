@@ -11,8 +11,6 @@
 FactoredOutputSet::FactoredOutputSet(const Network& network, uint8_t n)
 	: clusters(n), wireToCluster(n)
 {
-	assert(!network.IsGeneralized());
-
 	// Initialize clusters
 	for (uint8_t k = 0; k < n; k++)
 		clusters[k] = { 0, 1ULL << k };
@@ -253,20 +251,22 @@ void FactoredOutputSet::DoApplyCE(uint8_t i, uint8_t j)
 		hasPattern.Resize(patternSpaceSize);
 
 	// Apply the comparator to every pattern in the cluster
-	uint64_t ceWidth = j - i;
-	uint64_t jMask = 1ULL << j;
+	uint64_t ceMask = (1ULL << i) | (1ULL << j);
+	uint8_t ip = 63 - i;
+	uint8_t jp = 63 - j;
 	size_t writeIdx = 0;
 	for (size_t patternIdx = 0; patternIdx < cluster.size(); patternIdx++)
 	{
 		uint64_t pattern = cluster[patternIdx];
 
-		// Build a mask containing 1s at bits i and j if a swap should occur
-		uint64_t swapMask = (pattern << ceWidth) & ~pattern;
-		swapMask &= jMask;
-		swapMask |= swapMask >> ceWidth;
+		// Apply the swap if x_i = 1 and x_j = 0 branchlessly
+		uint64_t iBit = pattern << ip;
+		uint64_t jBit = pattern << jp;
+		uint64_t shouldSwap = iBit & ~jBit;
+		uint64_t swapMask = (int64_t)shouldSwap >> 63;
+		pattern ^= swapMask & ceMask;
 
-		// Apply the swap mask and insert
-		pattern ^= swapMask;
+		// Insert into cluster
 		if (!hasPattern[pattern])
 			cluster[writeIdx++] = pattern;
 		hasPattern.SetBit(pattern);
