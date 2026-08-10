@@ -6,6 +6,8 @@
 #include <algorithm>
 #include <set>
 
+#include "BitVec.h"
+
 FactoredOutputSet::FactoredOutputSet(const Network& network, uint8_t n)
 	: clusters(n), wireToCluster(n)
 {

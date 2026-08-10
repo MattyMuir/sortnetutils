@@ -1,6 +1,5 @@
 #pragma once
 #include "../Network/Network.h"
-#include "BitVec.h"
 
 class FactoredOutputSet
 {

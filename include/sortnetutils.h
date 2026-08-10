@@ -11,4 +11,5 @@
 #include "../src/Outputs/FactoredOutputSet.h"
 #include "../src/Outputs/OutputSet.h"
 #include "../src/Outputs/outpututil.h"
+#include "../src/Outputs/BitVec.h"
 #include "../src/Random/random.h"
