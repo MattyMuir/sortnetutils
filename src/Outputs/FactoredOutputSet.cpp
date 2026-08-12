@@ -5,6 +5,7 @@
 #include <bit>
 #include <algorithm>
 #include <set>
+#include <immintrin.h>
 
 #include "BitVec.h"
 
