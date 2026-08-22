@@ -14,4 +14,9 @@ public:
 
 	void Invert();
 	bool IsSymmetric() const;
+
+	/// Produces (a o b)
+	/// i.e. the permutation equivalent to applying b first, and then a
+	/// i.e. a(b(x))
+	static Permutation Compose(const Permutation& a, const Permutation& b);
 };

@@ -42,8 +42,9 @@ uint64_t Network::operator()(uint64_t x) const
 uint8_t Network::InferN() const
 {
 	uint8_t maxHi = 0;
-	for (auto [_, hi] : *this)
-		maxHi = std::max(maxHi, hi);
+	for (auto [i, j] : *this)
+		maxHi = std::max(maxHi, std::max(i, j));
+		
 	return maxHi + 1;
 }
 
@@ -128,4 +129,23 @@ void Network::Untangle()
 		}
 		ce = { newLo, newHi };
 	}
+}
+
+Permutation Network::GetOutputPermutation(const Permutation& perm) const
+{
+	Permutation mapsTo{ perm };
+	mapsTo.Invert();
+	for (const CE& ce : *this)
+	{
+		uint8_t newLo = mapsTo[ce.lo];
+		uint8_t newHi = mapsTo[ce.hi];
+		if (newLo > newHi)
+		{
+			mapsTo[ce.lo] = newHi;
+			mapsTo[ce.hi] = newLo;
+		}
+	}
+
+	mapsTo.Invert();
+	return mapsTo;
 }

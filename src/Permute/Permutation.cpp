@@ -31,3 +31,15 @@ bool Permutation::IsSymmetric() const
 			return false;
 	return true;
 }
+
+Permutation Permutation::Compose(const Permutation& a, const Permutation& b)
+{
+	Permutation composed(a.size());
+	for (uint8_t dst = 0; dst < a.size(); dst++)
+	{
+		uint8_t intermediate = a[dst];
+		uint8_t src = b[intermediate];
+		composed[dst] = src;
+	}
+	return composed;
+}

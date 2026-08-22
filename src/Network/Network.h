@@ -26,4 +26,8 @@ public:
 	static bool Identical(const Network& a, const Network& b);
 	void Permute(const Permutation& perm);
 	void Untangle();
+
+	/// Returns a permutation 'rho' such that
+	/// rho(outputs(this)) = outputs(untangle(perm(this)))
+	Permutation GetOutputPermutation(const Permutation& perm) const;
 };
