@@ -135,16 +135,10 @@ Permutation Network::GetOutputPermutation(const Permutation& perm) const
 {
 	Permutation mapsTo{ perm };
 	mapsTo.Invert();
+
 	for (const CE& ce : *this)
-	{
-		uint8_t newLo = mapsTo[ce.lo];
-		uint8_t newHi = mapsTo[ce.hi];
-		if (newLo > newHi)
-		{
-			mapsTo[ce.lo] = newHi;
-			mapsTo[ce.hi] = newLo;
-		}
-	}
+		if (mapsTo[ce.lo] > mapsTo[ce.hi])
+			std::swap(mapsTo[ce.lo], mapsTo[ce.hi]);
 
 	mapsTo.Invert();
 	return mapsTo;

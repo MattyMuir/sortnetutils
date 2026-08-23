@@ -1,6 +1,7 @@
 #include <print>
 #include <random>
 #include <numeric>
+#include <set>
 #include <sortnetutils.h>
 
 uint64_t RandomSelfMirror(uint8_t n)
@@ -13,49 +14,43 @@ uint64_t RandomSelfMirror(uint8_t n)
 	return x | (mirror << (n / 2));
 }
 
+void RunNetwork(const Network& network, std::vector<uint8_t>& arr)
+{
+	for (auto [i, j] : network)
+		if (arr[i] > arr[j])
+			std::swap(arr[i], arr[j]);
+}
+
 int main()
 {
 	// === Parameters ===
 	uint8_t n = 8;
-	size_t depth = 3;
+	Network network = ParseNetwork(R"(
+		[(0,2),(1,3),(4,6),(5,7)]
+		[(0,4),(1,5),(2,6),(3,7)]
+		)");
 	// ==================
 
-	static std::mt19937_64 gen{ std::random_device{}() };
-	for (;;)
+	std::set<Permutation> allOutputPerms;
+
+	Permutation perm(n);
+	std::ranges::iota(perm, 0);
+	do
 	{
-		// Generate random network and permutation
-		Network network = RandomNetworkLayered(n, depth, false);
-		Permutation perm(n);
-		std::ranges::iota(perm, 0);
-		std::ranges::shuffle(perm, gen);
+		allOutputPerms.insert(network.GetOutputPermutation(perm));
+	} while (std::ranges::next_permutation(perm).found);
 
-		// Get original outputs
-		std::vector<uint64_t> outputs = FactoredOutputSet{ network, n }.ToVector();
+	std::println("Number of output permutations: {}", allOutputPerms.size());
 
-		// Permute and untangle the network
-		Network permuted{ network };
-		permuted.Permute(perm);
-		permuted.Untangle();
+	std::set<std::vector<uint8_t>> allOutputs;
+	std::vector<uint8_t> input(n);
+	std::ranges::iota(input, 0);
+	do
+	{
+		auto output{ input };
+		RunNetwork(network, output);
+		allOutputs.insert(output);
+	} while (std::ranges::next_permutation(input).found);
 
-		// Get permuted outputs
-		std::vector<uint64_t> permutedOutputs = FactoredOutputSet{ permuted, n }.ToVector();
-		std::ranges::sort(permutedOutputs);
-
-		// Compute expected permuted outputs
-		Permutation outputPerm = network.GetOutputPermutation(perm);
-		std::vector<uint64_t> expectedPermuted{ outputs };
-		for (uint64_t& x : expectedPermuted)
-			x = outputPerm(x);
-		std::ranges::sort(expectedPermuted);
-
-		bool areSame = permutedOutputs == expectedPermuted;
-		std::println("{}", areSame);
-		if (!areSame)
-		{
-			std::println("Network:  {}", network);
-			std::println("perm:     {}", perm);
-			std::println("Permuted: {}", permuted);
-			break;
-		}
-	}
+	std::println("Number of outputs: {}", allOutputs.size());
 }
