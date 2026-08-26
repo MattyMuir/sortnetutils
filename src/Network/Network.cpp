@@ -2,10 +2,13 @@
 
 #include <algorithm>
 #include <numeric>
+#include <unordered_set>
+#include <bit>
 
 #include "LayeredNetwork.h"
 #include "IndexedNetwork.h"
 #include "../Outputs/FactoredOutputSet.h"
+#include "../Outputs/OutputSet.h"
 
 Network::Network(const LayeredNetwork& network)
 {
@@ -142,4 +145,66 @@ Permutation Network::GetOutputPermutation(const Permutation& perm) const
 
 	mapsTo.Invert();
 	return mapsTo;
+}
+
+std::optional<std::vector<uint8_t>> Network::GetInput(const std::vector<uint8_t>& output) const
+{
+	uint8_t n = (uint8_t)output.size();
+
+	// Get the binary outputs of the network
+	OutputSet binOutputs{ FactoredOutputSet{ *this, n } };
+
+	// Compute threshold masks and ensure each is a valid output
+	std::vector<uint64_t> phiT(n + 1);
+	for (uint8_t t = 0; t <= n; t++)
+	{
+		for (size_t i = 0; i < n; i++)
+			if (output[i] >= t)
+				phiT[t] |= (1ULL << i);
+
+		if (!binOutputs.Contains(phiT[t]))
+			return std::nullopt;
+	}
+
+	// Search for values s0, s1, ... sn that satisfy conditions (1) and (2) in the theorem
+	std::vector<std::unordered_set<uint64_t>> sCandidates(n + 1);
+	sCandidates[0].insert((1ULL << n) - 1);
+	sCandidates[n].insert(0);
+	for (uint8_t t = 1; t < n; t++)
+	{
+		for (uint64_t stm1 : sCandidates[t - 1])
+		{
+			for (uint8_t i = 0; i < n; i++)
+			{
+				if (~stm1 & (1ULL << i)) continue;
+				uint64_t st = stm1 ^ (1ULL << i);
+				if ((*this)(st) == phiT[t])
+					sCandidates[t].insert(st);
+			}
+		}
+		
+		if (sCandidates[t].empty()) return std::nullopt;
+	}
+
+	// Reconstruct the chain
+	std::vector<uint64_t> sChain(n + 1, 0);
+	for (int8_t t = n - 1; t >= 0; t--)
+	{
+		for (uint8_t i = 0; i < n; i++)
+		{
+			sChain[t] = sChain[t + 1] | (1ULL << i);
+			if (sCandidates[t].contains(sChain[t])) break;
+		}
+	}
+
+	// Extract the input from the chain
+	std::vector<uint8_t> input(n);
+	for (uint8_t t = 0; t < n; t++)
+	{
+		uint64_t mask = ~sChain[t + 1] & sChain[t];
+		uint64_t changePos = std::countr_zero(mask);
+		input[changePos] = t;
+	}
+
+	return input;
 }

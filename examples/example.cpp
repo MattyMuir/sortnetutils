@@ -2,17 +2,10 @@
 #include <random>
 #include <numeric>
 #include <set>
+#include <unordered_set>
+#include <chrono>
+
 #include <sortnetutils.h>
-
-uint64_t RandomSelfMirror(uint8_t n)
-{
-	static std::mt19937_64 gen{ std::random_device{}() };
-	std::uniform_int_distribution<uint64_t> dist{ 0, (1ULL << (n / 2)) - 1 };
-
-	uint64_t x = dist(gen);
-	uint64_t mirror = Mirror(n / 2, x);
-	return x | (mirror << (n / 2));
-}
 
 void RunNetwork(const Network& network, std::vector<uint8_t>& arr)
 {
@@ -23,34 +16,25 @@ void RunNetwork(const Network& network, std::vector<uint8_t>& arr)
 
 int main()
 {
-	// === Parameters ===
-	uint8_t n = 8;
-	Network network = ParseNetwork(R"(
-		[(0,2),(1,3),(4,6),(5,7)]
-		[(0,4),(1,5),(2,6),(3,7)]
+	uint8_t n = 16;
+	Network prefix = ParseNetwork(R"(
+		[(0,5),(1,4),(2,12),(3,13),(6,7),(8,9),(10,15),(11,14)]
+		[(0,2),(1,10),(3,6),(4,7),(5,14),(8,11),(9,12),(13,15)]
+		[(0,8),(1,3),(2,11),(4,13),(5,9),(6,10),(7,15),(12,14)]
 		)");
-	// ==================
 
-	std::set<Permutation> allOutputPerms;
-
-	Permutation perm(n);
-	std::ranges::iota(perm, 0);
-	do
-	{
-		allOutputPerms.insert(network.GetOutputPermutation(perm));
-	} while (std::ranges::next_permutation(perm).found);
-
-	std::println("Number of output permutations: {}", allOutputPerms.size());
-
-	std::set<std::vector<uint8_t>> allOutputs;
 	std::vector<uint8_t> input(n);
 	std::ranges::iota(input, 0);
-	do
-	{
-		auto output{ input };
-		RunNetwork(network, output);
-		allOutputs.insert(output);
-	} while (std::ranges::next_permutation(input).found);
+	static std::mt19937_64 gen{ std::random_device{}() };
+	std::ranges::shuffle(input, gen);
 
-	std::println("Number of outputs: {}", allOutputs.size());
+	std::vector<uint8_t> output{ input };
+	RunNetwork(prefix, output);
+
+	auto inputOpt = prefix.GetInput(output);
+	std::vector<uint8_t> outputRT{ *inputOpt };
+	RunNetwork(prefix, outputRT);
+
+	std::println("Output:    {}", output);
+	std::println("Output RT: {}", outputRT);
 }

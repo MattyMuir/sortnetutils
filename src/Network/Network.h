@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <format>
+#include <optional>
 
 #include "CE.h"
 #include "../Permute/Permutation.h"
@@ -30,4 +31,5 @@ public:
 	/// Returns a permutation 'rho' such that
 	/// rho(outputs(this)) = outputs(untangle(perm(this)))
 	Permutation GetOutputPermutation(const Permutation& perm) const;
+	std::optional<std::vector<uint8_t>> GetInput(const std::vector<uint8_t>& output) const;
 };
