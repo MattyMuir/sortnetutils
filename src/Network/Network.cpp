@@ -32,12 +32,14 @@ Network& Network::operator+=(const Network& other)
 
 uint64_t Network::operator()(uint64_t x) const
 {
-	for (auto [lo, hi] : *this)
+	for (auto [i, j] : *this)
 	{
-		uint64_t loMask = 1ULL << lo;
-		uint64_t hiMask = 1ULL << hi;
-		if ((x & loMask) && (~x & hiMask))
-			x ^= loMask | hiMask;
+		uint64_t xi = x >> i;
+		uint64_t xj = x >> j;
+		uint64_t swap = xi & ~xj;
+		uint64_t mask = swap & 1;
+		mask = (mask << i) | (mask << j);
+		x ^= mask;
 	}
 	return x;
 }
