@@ -4,6 +4,8 @@
 #include <set>
 #include <unordered_set>
 #include <chrono>
+#include <numeric>
+#include <algorithm>
 
 #include <sortnetutils.h>
 
@@ -12,8 +14,8 @@ std::vector<uint8_t> RandomVec(uint8_t n)
 	static std::mt19937_64 gen{ std::random_device{}() };
 
 	std::vector<uint8_t> perm(n);
-	std::ranges::iota(perm, 0);
-	std::ranges::shuffle(perm, gen);
+	std::iota(perm.begin(), perm.end(), 0);
+	std::shuffle(perm.begin(), perm.end(), gen);
 	return perm;
 }
 
