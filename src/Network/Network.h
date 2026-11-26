@@ -32,4 +32,5 @@ public:
 	/// rho(outputs(this)) = outputs(untangle(perm(this)))
 	Permutation GetOutputPermutation(const Permutation& perm) const;
 	std::optional<std::vector<uint8_t>> GetInput(const std::vector<uint8_t>& output) const;
+	std::optional<std::vector<uint8_t>> GetInputV2(const std::vector<uint8_t>& output) const;
 };
